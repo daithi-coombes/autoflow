@@ -45,7 +45,7 @@ class AutoFlow_API{
 		//build list of buttons
 		foreach($services as $slug => $service){
 			if(is_object($service))
-				$res .= "<li>" . $service->get_login_button();
+				$res .= "<li>" . $service->get_login_button( array(&$this, 'parse_dto') );
 			else
 				$res .= "<li>" . $this->api->get_login_button( $slug, __FILE__, array(&$this, 'parse_dto') );
 		}
