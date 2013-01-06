@@ -17,8 +17,6 @@ class AutoFlow_API{
 
 		//load api connection manager
 		global $API_Connection_Manager;
-		if(!$API_Connection_Manager)
-			$API_Connection_Manager = new API_Connection_Manager();
 		$this->api = $API_Connection_Manager;
 		
 		/**
@@ -45,7 +43,7 @@ class AutoFlow_API{
 		//build list of buttons
 		foreach($services as $slug => $service){
 			if(is_object($service))
-				$res .= "<li>" . $service->get_login_button( array(&$this, 'parse_dto') );
+				$res .= "<li>" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') );
 			else
 				$res .= "<li>" . $this->api->get_login_button( $slug, __FILE__, array(&$this, 'parse_dto') );
 		}
@@ -69,6 +67,8 @@ class AutoFlow_API{
 	 * @param stdClass $dto The response dto.
 	 */
 	public function parse_dto( stdClass $dto ){
+		
+		ar_print($this);
 		
 		//make request for email
 		switch ($dto->slug) {
