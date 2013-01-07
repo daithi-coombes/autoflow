@@ -68,7 +68,8 @@ class AutoFlow_API{
 	 */
 	public function parse_dto( stdClass $dto ){
 		
-		ar_print($this);
+		global $API_Connection_Manager;
+		$module = $API_Connection_Manager->get_service($dto->slug);
 		
 		//make request for email
 		switch ($dto->slug) {
@@ -123,6 +124,21 @@ class AutoFlow_API{
 				$emails = (array) json_decode($res['body'])->email;
 				break;
 			//end Facebook
+			
+			/**
+			 * Twitter 
+			 */
+			case 'twitter/index.php':
+				
+				print "<h1>Unfortunately twitter doesn't provide your email address so therefore can't be used for sign in</h1>";
+				print "<p>Twitter are the only provider that doesn't do this but to make things worse they've been completely ignoring the community since 2009...</p>";
+				print "<u>\n";
+				print "<li><a href=\"https://dev.twitter.com/discussions/1737\">https://dev.twitter.com/discussions/1737</a></li>\n";
+				print "<li><a href=\"https://dev.twitter.com/discussions/567\">https://dev.twitter.com/discussions/567</a></li>\n";
+				print "<li><a href=\"https://dev.twitter.com/discussions/1498\">https://dev.twitter.com/discussions/1498</a></li>\n";
+				print "</ul>\n";
+				exit;
+				break;
 			
 			/**
 			 * Default die( error ) 
