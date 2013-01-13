@@ -42,10 +42,7 @@ class AutoFlow_API{
 		
 		//build list of buttons
 		foreach($services as $slug => $service){
-			if(is_object($service))
-				$res .= "<li>" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') );
-			else
-				$res .= "<li>" . $this->api->get_login_button( $slug, __FILE__, array(&$this, 'parse_dto') );
+			$res .= "<li><a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\">Login with {$service->Name}</a></li>\n";
 		}
 		
 		//print result
@@ -97,15 +94,10 @@ class AutoFlow_API{
 			 */
 			case 'google/index.php':
 				
-				$res = $this->api->request($dto->slug, array(
-					'uri' => "https://www.googleapis.com/oauth2/v1/userinfo?access_token={$dto->access_token}", 
-					'headers' => array(
-						'Authorization' => "Bearer {$dto->access_token}"
-					),
-					'method' => 'get',
-					'access_token' => $dto->access_token
-				));
-				
+				$res = $module->request(
+						"https://www.googleapis.com/oauth2/v1/userinfo?access_token={$dto->response['access_token']}",
+						"GET"
+						);
 				$emails = array( json_decode($res['body'])->email );
 				break;
 			//end Google
@@ -166,10 +158,12 @@ class AutoFlow_API{
 		//log in user
 		wp_set_current_user( $user->data->ID );
 		wp_set_auth_cookie( $user->data->ID );
-		$this->api->set_user_token($dto->slug, $dto->access_token, 'access', $user->data->ID);
-		if(@$dto->refresh_token)
-			$this->api->set_user_token($dto->slug, $dto->refresh_token, 'refresh', $user->data->ID);
-		wp_redirect("/wp-admin");
+		do_action('wp_login', $user->data->user_login, $user);
+		$module->user = $user;
+		
+		//set access token
+		$module->set_params($dto->response);
+		wp_redirect(admin_url());
 		exit();
 	}
 	
