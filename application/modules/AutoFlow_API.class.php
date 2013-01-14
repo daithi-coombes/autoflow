@@ -106,12 +106,10 @@ class AutoFlow_API{
 			 * Facebook 
 			 */
 			case 'facebook/index.php':
-				
-				$res = $this->api->request($dto->slug, array(
-					'uri' => "https://graph.facebook.com/me?access_token={$dto->access_token}",
-					'method' => 'get',
-					'access_token' => $dto->access_token
-				));
+				$res = $module->request(
+					"https://graph.facebook.com/me?access_token={$dto->response['access_token']}",
+					'get'
+				);
 				
 				$emails = (array) json_decode($res['body'])->email;
 				break;
@@ -151,7 +149,7 @@ class AutoFlow_API{
 		}
 
 		//error report
-		if(!$user)
+		if(!$user_id)
 			die("<b>AutoFlow API</b>:<br/>
 				Email on service account <em>{$email}</em> does not match any on profiles on this blog");
 		
