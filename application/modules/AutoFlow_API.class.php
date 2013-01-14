@@ -42,7 +42,10 @@ class AutoFlow_API{
 		
 		//build list of buttons
 		foreach($services as $slug => $service){
-			$res .= "<li><a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\">Login with {$service->Name}</a></li>\n";
+			if(is_object($service))
+				$res .= "<li><a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\">Login with {$service->Name}</a></li>\n";
+			else
+				ar_print($service);
 		}
 		
 		//print result
@@ -76,14 +79,10 @@ class AutoFlow_API{
 			 */
 			case 'github/index.php':
 
-				$res = $this->api->request( $dto->slug, array(
-					'uri' => "https://api.github.com/user/emails?access_token={$dto->access_token}&scope=user,public_repo",
-					'headers' => array(
-						'Accept' => 'application/json'
-					),
-					'method' => 'get',
-					'access_token' => $dto->access_token
-				));
+				$res = $module->request(
+					"https://api.github.com/user/emails?access_token={$dto->response['access_token']}&scope=user,public_repo",
+					"get"
+				);
 				
 				$emails = (array) json_decode($res['body']);
 				break;
