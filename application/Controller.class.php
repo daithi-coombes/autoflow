@@ -355,10 +355,10 @@ if(!class_exists("WPPluginFrameWorkController")):
 
 					//if val is method call
 					if(is_array($val)){
-						$method = array_shift($val);
+						$method = $val[1];
 						if(method_exists($this, $method))
 							$val = $this->$method( $val );
-						else $val = "unkown shortcode";
+						else $val = "unkown shortcode <em>{$code}</em>";
 					}
 					$this->html = str_replace("<!--[--{$code}--]-->", $val, $this->html);
 				}

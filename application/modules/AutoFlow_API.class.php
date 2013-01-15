@@ -3,10 +3,14 @@
 //include api-connection-manager class
 require_once( WP_PLUGIN_DIR . "/api-connection-manager/class-api-connection-manager.php");
 
-class AutoFlow_API{
+class AutoFlow_API extends WPPluginFrameWorkController{
 
+	/** @var string The role assigned to new users */
+	public $new_user_role = "subscriber";
 	/** @var API_Connection_Manager The api connection manager */
 	private $api;
+	/** @var string The prefix to use for meta and option keys */
+	private $option_name = "AutoFlow";
 
 	/**
 	 * Construct.
@@ -15,9 +19,20 @@ class AutoFlow_API{
 	 */
 	function __construct(){
 
-		//load api connection manager
 		global $API_Connection_Manager;
 		$this->api = $API_Connection_Manager;
+		$action = @$_REQUEST['action'];
+		
+		if($action)
+			if(method_exists($this, $action))
+				$this->$action();
+		
+		$this->shortcodes = array(
+			'list services' => array(&$this, 'list_services')
+		);
+		
+		//add settings page
+		add_action('admin_menu', array(&$this, 'get_menu'));
 		
 		/**
 		 * add login form hook
@@ -26,9 +41,154 @@ class AutoFlow_API{
 		 */
 		add_action( 'login_footer', array( &$this, 'print_login_buttons' ) );
 		//add_filter( 'login_message', array(&$this, 'print_login_errors' ) );
-		add_shortcode( 'AutoFlow', array( &$this, 'print_login_buttons' ) );		
+		add_shortcode( 'AutoFlow', array( &$this, 'print_login_buttons' ) );
+		
+		parent::__construct( get_class($this));
 	}
+	
+	/**
+	 * Create Account
+	 * If user is not logged in and there is no matching uid then create
+	 * a new account for this social network. If there is no email
+	 * returned from the service then show form to grab email
+	 * @see AutoFlow_API::parse_dto()
+	 * @link http://tommcfarlin.com/create-a-user-in-wordpress/
+	 */
+	public function create_account($email_address, $username, $slug, $uid){
+		
+		global $wp_query;
+		$wp_query = new WP_Query();
+		$username = preg_replace("/[^a-zA-Z0-9\s\.-]+/", "", $username);
+		$username = preg_replace("/[\s\.-]+/", "_", $username); //str_replace(" ", "_", $username);
+		$password = wp_generate_password( 12, false );
+		
+		// Generate the password and create the user
+		$user_id = wp_create_user( $username, $password, $email_address );
 
+		// Set the nickname
+		$user_data = wp_update_user(array(
+			'ID' => $user_id,
+			'nickname' => $username
+		));
+
+		// Set the role
+		$user = new WP_User( $user_id );
+		$user->set_role( $this->new_user_role ); //'contributor' );
+
+		// Email the user
+		wp_mail( $email_address, 'Welcome!', 'Your Password: ' . $password );
+		
+		//print head
+		?><html><head><?php
+		wp_enqueue_style('media');
+		wp_enqueue_style('colors');
+		@wp_head();
+		?></head><?php
+		
+		//iframe body
+		?><body id="media-upload" class="js"><?php
+		
+		//if not userdata
+		if(!$user_data)
+			print "<h2>Error creating account</h2>";
+		//success
+		else{
+			print "<h2>Your account has been created successfully</h2>";
+			print "<h4>Details, please store these safely:
+				<ul>
+					<li>Username: {$username}</li>
+					<li>Password: {$password}</li>
+					<li>Email: {$email_address}</li>
+				</ul>
+				<a href=\"" . wp_login_url() . "\" title=\"Login\">Login</a>";
+
+			/**
+			* Set service uid to newly created user for future logins.
+			*/
+			$connections = get_option($this->option_name, array());
+			$connections[$slug][$user_id] = $uid;
+			update_option($this->option_name, $connections);
+			//end set service uid
+		}
+		//footer and die()
+		@wp_footer();
+		?></body></html><?php
+	}
+	
+	public function disconnect(){
+		$user_id = $this->api->get_current_user()->ID;
+		$meta = get_option($this->option_name, array());
+		unset($meta[$_REQUEST['slug']][$user_id]);
+		update_option($this->option_name, $meta);
+	}
+	
+	/**
+	 * Build the admin menu 
+	 */
+	public function get_menu(){
+		add_menu_page("AutoFlow", "AutoFlow", "manage_options", "autoflow", array(&$this, 'get_page'));
+	}
+	
+	/**
+	 * Callback for displaying the html in the dashboard settings page
+	 * @global API_Connection_Manager $API_Connection_Manager
+	 * @global type $current_user
+	 * @return type 
+	 */
+	public function list_services(){
+		
+		global $API_Connection_Manager;
+		global $current_user;
+		
+		$count=1;
+		$html = "<div id=\"dashboard-widgets\" class=\"metabox-holder columns-1\">\n";
+		$meta = get_option($this->option_name, array());
+		$modules = $API_Connection_Manager->get_services();
+		
+		foreach($modules as $slug=>$module){
+			
+			/**
+			 * get status icon and params
+			 */
+			if(@$meta[$slug][$current_user->ID]){
+				$valid = true;
+				$status = "status_icon_green_12x12.png";
+			}
+			else{
+				$valid = false;
+				$status = "status_icon_red_12x12.png";
+			}
+			//end get status icona  and params
+			$html .= "<div id=\"postbox-container-{$count}\" class=\"postbox-container\">
+					<div class=\"postbox\">
+						<h3>
+							<img src=\"".WP_PLUGIN_URL."/api-connection-manager/images/{$status}\" width=\"12\" height=\"12\"/>
+							{$module->Name}</h3>
+						<div class=\"inside\">";
+							
+			//print delete access tokens / show login link
+			if($valid)
+				$html .= "
+					<form method=\"post\">
+						<input type=\"hidden\" name=\"action\" value=\"disconnect\"/>
+						<input type=\"hidden\" name=\"slug\" value=\"{$slug}\"/>
+						<input type=\"submit\" value=\"Disconnect\"/>
+					</form>";
+			else
+				$html .= "<p>You are not connected to {$module->Name}</p>
+					<p><a href=\"" . $module->get_login_button(__FILE__, array(&$this, 'parse_dto', false)) . "\" target=\"_new\">
+						Connect your wordpress account with {$module->Name}</a>";
+					
+			//close container
+			$html .= "	</div>
+					</div>
+				</div>";
+			$count++;
+		}
+		
+		return $html .= "</ul>\n";
+	}
+	
 	/**
 	 * Prints the login buttons.
 	 * 
@@ -110,7 +270,10 @@ class AutoFlow_API{
 					'get'
 				);
 				
-				$emails = (array) json_decode($res['body'])->email;
+				$body = json_decode($res['body']);
+				$uid = $body->id;
+				$emails = (array) $body->email;
+				$username = $body->username;
 				break;
 			//end Facebook
 			
@@ -138,72 +301,59 @@ class AutoFlow_API{
 				break;
 		}//end switch slug
 		
-		//get user object by email
-		foreach ( (array) $emails as $email ) {
-			$user_id = email_exists( $email );
-			if ( $user_id ){
-				$user = get_userdata( $user_id );
-				break;
-			}
-		}
 
-		//error report
-		if(!$user_id)
-			die("<b>AutoFlow API</b>:<br/>
-				Email on service account <em>{$email}</em> does not match any on profiles on this blog");
+		//vars
+		if(@$API_Connection_Manager->get_current_user()->id)
+			$user_id = $API_Connection_Manager->get_current_user()->id;
+		else
+			$user_id = false;
+		$connections = get_option($this->option_name, array());
 		
-		//log in user
-		wp_set_current_user( $user->data->ID );
-		wp_set_auth_cookie( $user->data->ID );
-		do_action('wp_login', $user->data->user_login, $user);
-		$module->user = $user;
-		
-		//set access token
-		$module->set_params($dto->response);
-		wp_redirect(admin_url());
-		exit();
-	}
-	
-	/**
-	 * Returns the emails for an account on a service.
-	 * 
-	 * Is used for logging and testing access_tokens.
-	 * 
-	 * @todo change so always returns an array instead of string|array
-	 * @todo use oauth2's token checking calls instead
-	 * @param string $slug The service slug
-	 * @param string $access_token The access token
-	 * @return emails 
-	 * @deprecated
-	 * @subpackage service-method
-	 */
-	private function _service_get_account_emails($slug, $access_token){
-		
-		$service = $this->get_service($slug);
-		$params = $service['params'];
-		$req = array();
-		$req['access_token'] = $access_token;
-		$emails = false;
-		$user = false;
-
-		//get request for account info
-		if("get"==strtolower($params['account-method'])){
-			$url = url_query_append($params['account-uri'], $req);
-			$res = wp_remote_get($url);
+		/**
+		 * Update meta.
+		 * If user logged in then request must be from autoflow dashboard so
+		 * get uid from service and save to meta
+		 */
+		if($user_id){
+			$connections[$dto->slug][$user_id] = $uid;
+			update_option($this->option_name, $connections);
 		}
+		//end update meta
 		
-		//look for email from result
-		if('json'==strtolower($params['account-response-type'])){
-			$res = json_decode($res['body']);
+		else{
+			$data = $connections[$dto->slug];
 			
-			$key = $params['account-response-email-var'];
-			if(@$res->$key)
-				$emails = $res->$key;
-			if(is_array($res))
-				$emails = $res;
-		}
-		
-		if(!$emails) return $this->_error("No emails returned");
-		return $emails;
-	}	
+			/**
+			 * Login
+			 * Check if service uid is matched to user, if it is then login user
+			 * and redirect to wp-admin (dashboard)
+			 */
+			foreach($data as $user_id => $service_id)
+				if($uid==$service_id){
+					
+					//get user
+					$user = get_userdata( $user_id );
+					if(!$user || (!get_class($user)=="WP_User"))
+						continue;
+					
+					//login
+					wp_set_current_user( $user->data->ID );
+					wp_set_auth_cookie( $user->data->ID );
+					do_action('wp_login', $user->data->user_login, $user);
+					
+					//update module and redirect
+					$module->user = $user;
+					$module->set_params($dto->response);
+					wp_redirect(admin_url());
+					exit();
+				}
+			//end Login
+				
+			//if no uid match and no email address from service, redirect to
+			//email form
+			if(count($emails))
+				$this->create_account($emails[0], $username, $dto->slug, $uid);
+			
+		}		
+	}
 }
