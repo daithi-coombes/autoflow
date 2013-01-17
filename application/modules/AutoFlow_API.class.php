@@ -56,8 +56,6 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 	 */
 	public function create_account($email_address, $username, $slug, $uid){
 		
-		global $wp_query;
-		$wp_query = new WP_Query();
 		$username = preg_replace("/[^a-zA-Z0-9\s\.-]+/", "", $username);
 		$username = preg_replace("/[\s\.-]+/", "_", $username); //str_replace(" ", "_", $username);
 		$password = wp_generate_password( 12, false );
@@ -115,6 +113,9 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		?></body></html><?php
 	}
 	
+	/**
+	 * Disconnect a user from a service 
+	 */
 	public function disconnect(){
 		$user_id = $this->api->get_current_user()->ID;
 		$meta = get_option($this->option_name, array());
@@ -205,7 +206,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			if(is_object($service))
 				$res .= "<li><a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\">Login with {$service->Name}</a></li>\n";
 			else
-				ar_print($service);
+				continue;
 		}
 		
 		//print result
@@ -233,6 +234,16 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		
 		//make request for email
 		switch ($dto->slug) {
+			
+			case 'dropbox/index.php':
+				
+				$module->set_params($dto->response);
+				
+				$res = $module->request(
+						"https://api.dropbox.com/1/account/info",
+						"GET"
+						);
+				break;
 			
 			/**
 			 * Github 
@@ -282,14 +293,12 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			 */
 			case 'twitter/index.php':
 				
-				print "<h1>Unfortunately twitter doesn't provide your email address so therefore can't be used for sign in</h1>";
-				print "<p>Twitter are the only provider that doesn't do this but to make things worse they've been completely ignoring the community since 2009...</p>";
-				print "<u>\n";
-				print "<li><a href=\"https://dev.twitter.com/discussions/1737\">https://dev.twitter.com/discussions/1737</a></li>\n";
-				print "<li><a href=\"https://dev.twitter.com/discussions/567\">https://dev.twitter.com/discussions/567</a></li>\n";
-				print "<li><a href=\"https://dev.twitter.com/discussions/1498\">https://dev.twitter.com/discussions/1498</a></li>\n";
-				print "</ul>\n";
-				exit;
+				$module->set_params($dto->response);
+				$res = $module->request("https://api.twitter.com/1.1/account/verify_credentials.json", "GET");
+				$body = $module->parse_response($res);
+				$uid = $body->id;
+				$username = $body->screen_name;
+				$emails = false;
 				break;
 			
 			/**
@@ -321,39 +330,58 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		//end update meta
 		
 		else{
-			$data = $connections[$dto->slug];
+			$data = @$connections[$dto->slug];
 			
 			/**
 			 * Login
 			 * Check if service uid is matched to user, if it is then login user
 			 * and redirect to wp-admin (dashboard)
 			 */
-			foreach($data as $user_id => $service_id)
-				if($uid==$service_id){
-					
-					//get user
-					$user = get_userdata( $user_id );
-					if(!$user || (!get_class($user)=="WP_User"))
-						continue;
-					
-					//login
-					wp_set_current_user( $user->data->ID );
-					wp_set_auth_cookie( $user->data->ID );
-					do_action('wp_login', $user->data->user_login, $user);
-					
-					//update module and redirect
-					$module->user = $user;
-					$module->set_params($dto->response);
-					wp_redirect(admin_url());
-					exit();
-				}
+			if(count($data))
+				foreach($data as $user_id => $service_id)
+					if($uid==$service_id){
+
+						//get user
+						$user = get_userdata( $user_id );
+						if(!$user || (!get_class($user)=="WP_User"))
+							continue;
+
+						//login
+						wp_set_current_user( $user->data->ID );
+						wp_set_auth_cookie( $user->data->ID );
+						do_action('wp_login', $user->data->user_login, $user);
+
+						//update module and redirect
+						$module->user = $user;
+						$module->set_params($dto->response);
+						wp_redirect(admin_url());
+						exit();
+					}
 			//end Login
-				
-			//if no uid match and no email address from service, redirect to
-			//email form
-			if(count($emails))
-				$this->create_account($emails[0], $username, $dto->slug, $uid);
 			
+			/**
+			 * Create new account 
+			 */
+			//if emails provided
+			if(count($emails) && is_array($emails)){
+				$this->create_account($emails[0], $username, $dto->slug, $uid);
+			}
+			//else print email form
+			else{
+				$nonce = wp_create_nonce("autoflow_get_email");
+				print "<form method=\"post\">
+						<input type=\"hidden\" name=\"wp_nonce\" value=\"{$nonce}\"/>
+						<label>Please enter your email address:
+							<input type=\"text\" name=\"email\"/>
+						</label>
+						<label>Re-enter email address:
+							<input type=\"text\" name=\"email2\"/>
+						</label>
+						<input type=\"submit\" value=\"Create Account\"/>
+					</form>";
+			}
+			//end Create new account
+				
 		}		
 	}
 }
