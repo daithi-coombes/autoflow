@@ -32,6 +32,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		);
 		
 		//add settings page
+		add_action('wp_ajax_nopriv_autoflow_api', array(&$this, 'email_form_callback'));
 		add_action('admin_menu', array(&$this, 'get_menu'));
 		
 		/**
@@ -111,6 +112,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		//footer and die()
 		@wp_footer();
 		?></body></html><?php
+		die();
 	}
 	
 	/**
@@ -121,6 +123,23 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		$meta = get_option($this->option_name, array());
 		unset($meta[$_REQUEST['slug']][$user_id]);
 		update_option($this->option_name, $meta);
+	}
+	
+	/**
+	 * Process form requesting email address and then create new account.
+	 */
+	public function email_form_callback(){
+		
+		//check nonce
+		if(!wp_verify_nonce($_REQUEST['wp_nonce'],"autoflow_get_email"))
+			die("invalid nonce");
+		//check email
+		if($_REQUEST['email']!=$_REQUEST['email2'])
+			die("Emails don't match");
+		
+		//create account and die
+		$this->create_account($_REQUEST['email'], $_REQUEST['username'], $_REQUEST['slug'], $_REQUEST['uid']);
+		die();
 	}
 	
 	/**
@@ -369,8 +388,11 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			//else print email form
 			else{
 				$nonce = wp_create_nonce("autoflow_get_email");
-				print "<form method=\"post\">
+				print "<form method=\"post\" action=\"".admin_url('admin-ajax.php')."?action=autoflow_api\">
 						<input type=\"hidden\" name=\"wp_nonce\" value=\"{$nonce}\"/>
+						<input type=\"hidden\" name=\"slug\" value=\"{$dto->slug}\"/>
+						<input type=\"hidden\" name=\"uid\" value=\"{$uid}\"/>
+						<input type=\"hidden\" name=\"username\" value=\"{$username}\"/>
 						<label>Please enter your email address:
 							<input type=\"text\" name=\"email\"/>
 						</label>
