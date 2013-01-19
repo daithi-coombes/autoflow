@@ -18,7 +18,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 	 * @global API_Connection_Manager $API_Connection_Manager 
 	 */
 	function __construct(){
-
+		
 		global $API_Connection_Manager;
 		$this->api = $API_Connection_Manager;
 		$action = @$_REQUEST['action'];
@@ -258,10 +258,8 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 				
 				$module->set_params($dto->response);
 				
-				$res = $module->request(
-						"https://api.dropbox.com/1/account/info",
-						"GET"
-						);
+				ar_print($dto);
+				die();
 				break;
 			
 			/**
