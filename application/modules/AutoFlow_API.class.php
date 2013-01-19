@@ -64,6 +64,9 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		// Generate the password and create the user
 		$user_id = wp_create_user( $username, $password, $email_address );
 
+		if(is_wp_error($user_id))
+			die($user_id->get_error_message ());
+		
 		// Set the nickname
 		$user_data = wp_update_user(array(
 			'ID' => $user_id,
@@ -392,19 +395,23 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			//else print email form
 			else{
 				$nonce = wp_create_nonce("autoflow_get_email");
-				print "<form method=\"post\" action=\"".admin_url('admin-ajax.php')."?action=autoflow_api\">
+				print "
+					<h3>AutoFLow Wordpress Social Login</h3>
+					<p>Creating new account...</p>
+					<form method=\"post\" action=\"".admin_url('admin-ajax.php')."?action=autoflow_api\">
 						<input type=\"hidden\" name=\"wp_nonce\" value=\"{$nonce}\"/>
 						<input type=\"hidden\" name=\"slug\" value=\"{$dto->slug}\"/>
 						<input type=\"hidden\" name=\"uid\" value=\"{$uid}\"/>
 						<input type=\"hidden\" name=\"username\" value=\"{$username}\"/>
 						<label>Please enter your email address:
 							<input type=\"text\" name=\"email\"/>
-						</label>
+						</label><br/>
 						<label>Re-enter email address:
 							<input type=\"text\" name=\"email2\"/>
-						</label>
+						</label><br/>
 						<input type=\"submit\" value=\"Create Account\"/>
 					</form>";
+				die();
 			}
 			//end Create new account
 				
