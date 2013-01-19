@@ -167,7 +167,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		$html = "<div id=\"dashboard-widgets\" class=\"metabox-holder columns-1\">\n";
 		$meta = get_option($this->option_name, array());
 		$modules = $API_Connection_Manager->get_services();
-		
+		ar_print($meta);
 		foreach($modules as $slug=>$module){
 			
 			/**
@@ -363,7 +363,15 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			 * Check if service uid is matched to user, if it is then login user
 			 * and redirect to wp-admin (dashboard)
 			 */
-			if(count($data))
+			if(count($data)){
+				
+				//get module and try login
+				$module = $API_Connection_Manager->get_service($dto->slug);
+				$module->login($dto->slug, $uid);
+				$module->log($connections);
+				/**
+				 * @deprecated 
+				 *
 				foreach($data as $user_id => $service_id)
 					if($uid==$service_id){
 
@@ -383,6 +391,9 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 						wp_redirect(admin_url());
 						exit();
 					}
+				 * 
+				 */
+			}
 			//end Login
 			
 			/**
