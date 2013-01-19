@@ -257,9 +257,15 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			case 'dropbox/index.php':
 				
 				$module->set_params($dto->response);
+				$res = $module->request(
+						"https://api.dropbox.com/1/account/info",
+						"get"
+				);
 				
-				ar_print($dto);
-				die();
+				$body = json_decode($res['body']);
+				$uid = $body->uid;
+				$username = $body->display_name;
+				$emails = false;
 				break;
 			
 			/**
