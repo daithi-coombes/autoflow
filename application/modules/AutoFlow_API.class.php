@@ -57,6 +57,8 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 	 */
 	public function create_account($email_address, $username, $slug, $uid){
 		
+		global $API_Connection_Manager;
+		
 		$username = preg_replace("/[^a-zA-Z0-9\s\.-]+/", "", $username);
 		$username = preg_replace("/[\s\.-]+/", "_", $username); //str_replace(" ", "_", $username);
 		$password = wp_generate_password( 12, false );
@@ -79,6 +81,10 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 
 		// Email the user
 		wp_mail( $email_address, 'Welcome!', 'Your Password: ' . $password );
+		
+		//link up user with module uid
+		$service = $API_Connection_Manager->get_service($slug);
+		$service->login_connect($user_id,$uid);
 		
 		//print head
 		?><html><head><?php
@@ -149,7 +155,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 	 * Build the admin menu 
 	 */
 	public function get_menu(){
-		add_menu_page("AutoFlow", "AutoFlow", "manage_options", "autoflow", array(&$this, 'get_page'));
+		add_menu_page("AutoFlow", "AutoFlow", "read", "autoflow", array(&$this, 'get_page'));
 	}
 	
 	/**
@@ -165,9 +171,9 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		
 		$count=1;
 		$html = "<div id=\"dashboard-widgets\" class=\"metabox-holder columns-1\">\n";
-		$meta = get_option($this->option_name, array());
+		$meta = get_option("API_Con_Mngr_Module-connections", array());
 		$modules = $API_Connection_Manager->get_services();
-		ar_print($meta);
+		
 		foreach($modules as $slug=>$module){
 			
 			/**
@@ -342,60 +348,17 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			$user_id = $API_Connection_Manager->get_current_user()->id;
 		else
 			$user_id = false;
-		$connections = get_option($this->option_name, array());
 		
 		/**
-		 * Update meta.
-		 * If user logged in then request must be from autoflow dashboard so
-		 * get uid from service and save to meta
+		 * If logged in user then connect the account.
+		 * Request must be from dashboard autoflow settings page.
 		 */
-		if($user_id){
-			$connections[$dto->slug][$user_id] = $uid;
-			update_option($this->option_name, $connections);
-		}
-		//end update meta
-		
-		else{
-			$data = @$connections[$dto->slug];
-			
-			/**
-			 * Login
-			 * Check if service uid is matched to user, if it is then login user
-			 * and redirect to wp-admin (dashboard)
-			 */
-			if(count($data)){
-				
-				//get module and try login
-				$module = $API_Connection_Manager->get_service($dto->slug);
-				$module->login($dto->slug, $uid);
-				$module->log($connections);
-				/**
-				 * @deprecated 
-				 *
-				foreach($data as $user_id => $service_id)
-					if($uid==$service_id){
+		if(!$module->login($uid))
 
-						//get user
-						$user = get_userdata( $user_id );
-						if(!$user || (!get_class($user)=="WP_User"))
-							continue;
-
-						//login
-						wp_set_current_user( $user->data->ID );
-						wp_set_auth_cookie( $user->data->ID );
-						do_action('wp_login', $user->data->user_login, $user);
-
-						//update module and redirect
-						$module->user = $user;
-						$module->set_params($dto->response);
-						wp_redirect(admin_url());
-						exit();
-					}
-				 * 
-				 */
-			}
-			//end Login
-			
+		/**
+		 * If no logged in user then create new account
+		 */
+		{	
 			/**
 			 * Create new account 
 			 */
