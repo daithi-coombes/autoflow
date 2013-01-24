@@ -300,6 +300,12 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 						"https://www.googleapis.com/oauth2/v1/userinfo?access_token={$dto->response['access_token']}",
 						"GET"
 						);
+				
+				
+				$profile = json_decode($res['body']);
+				$emails = array($profile->email);
+				$uid = array($profile->id);
+				$username = $profile->name;
 				$emails = array( json_decode($res['body'])->email );
 				break;
 			//end Google
