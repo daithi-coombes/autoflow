@@ -233,8 +233,10 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		foreach($services as $slug => $service){
 			if(is_object($service))
 				$res .= "<li><a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\">Login with {$service->Name}</a></li>\n";
-			else
+			else{
+				ar_print($service);
 				continue;
+			}
 		}
 		
 		//print result
