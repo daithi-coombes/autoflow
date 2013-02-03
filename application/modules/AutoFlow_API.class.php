@@ -230,14 +230,8 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		$res = "<ul>\n";
 		
 		//build list of buttons
-		foreach($services as $slug => $service){
-			if(is_object($service))
+		foreach($services as $slug => $service)
 				$res .= "<li><a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\">Login with {$service->Name}</a></li>\n";
-			else{
-				ar_print($service);
-				continue;
-			}
-		}
 		
 		//print result
 		print "{$res}\n</ul>\n";
@@ -264,6 +258,19 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		
 		//make request for email
 		switch ($dto->slug) {
+			
+			case 'cityindex/index.php':
+				
+				$module->set_params($dto->response);
+				$res = $module->request(
+						'/ClientAndTradingAccount',
+						'get'
+				);
+				$uid = $res->ClientAccountId;
+				$username = $res->LogonUserName;
+				ar_print($res);
+				die();
+				break;
 			
 			case 'dropbox/index.php':
 				
