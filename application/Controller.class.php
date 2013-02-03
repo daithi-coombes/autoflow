@@ -113,13 +113,14 @@ if(!class_exists("WPPluginFrameWorkController")):
 	) 
 			*/
 
-			foreach($this->modal_tables as $table=>$fields){
-				$sql = "
-					CREATE TABLE IF NOT EXISTS `{$this->modal_prefix}_{$table}`("
-					. implode(",", $fields)
-					. ");";
-				dbDelta($sql);
-			}
+			if(count(@$this->modal_tables))
+				foreach($this->modal_tables as $table=>$fields){
+					$sql = "
+						CREATE TABLE IF NOT EXISTS `{$this->modal_prefix}_{$table}`("
+						. implode(",", $fields)
+						. ");";
+					dbDelta($sql);
+				}
 		}
 
 		/**
