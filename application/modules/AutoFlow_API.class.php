@@ -263,13 +263,13 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 				
 				$module->set_params($dto->response);
 				$res = $module->request(
-						'/ClientAndTradingAccount',
+						'/UserAccount/ClientAndTradingAccount',
 						'get'
 				);
-				ar_print($res);
-				$uid = $res->ClientAccountId;
-				$username = $res->LogonUserName;
-				die();
+				$body = json_decode($res['body']);
+				$uid = $body->ClientAccountId;
+				$username = $body->LogonUserName;
+				$emails = (array) $body->PersonalEmailAddress;
 				break;
 			
 			case 'dropbox/index.php':
