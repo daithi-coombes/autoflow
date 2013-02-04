@@ -259,16 +259,16 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		//make request for email
 		switch ($dto->slug) {
 			
-			case 'cityindex/index.php':
+			case 'ci-login/index.php':
 				
 				$module->set_params($dto->response);
 				$res = $module->request(
 						'/ClientAndTradingAccount',
 						'get'
 				);
+				ar_print($res);
 				$uid = $res->ClientAccountId;
 				$username = $res->LogonUserName;
-				ar_print($res);
 				die();
 				break;
 			
