@@ -274,9 +274,14 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 				$username = $body->LogonUserName;
 				$emails = (array) $body->PersonalEmailAddress;
 				break;
+			//end cityindex
 			
 			/**
+<<<<<<< HEAD
 			 * Dropbox
+=======
+			 * DropBox
+>>>>>>> dev
 			 */
 			case 'dropbox/index.php':
 				
@@ -291,18 +296,44 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 				$username = $body->display_name;
 				$emails = false;
 				break;
+			//end dropbox
+			
+			/**
+			 * Facebook 
+			 */
+			case 'facebook/index.php':
+				$res = $module->request(
+					"https://graph.facebook.com/me?access_token={$dto->response['access_token']}",
+					'get'
+				);
+				
+				$body = json_decode($res['body']);
+				$uid = $body->id;
+				$emails = (array) $body->email;
+				$username = $body->username;
+				break;
+			//end Facebook
 			
 			/**
 			 * Github 
 			 */
 			case 'github/index.php':
-
+				
+				//get user details
+				$res = $module->request(
+					"https://api.github.com/user?access_token={$dto->response['access_token']}&scope=user,public_repo",
+					"get"
+				);
+				$body = json_decode($res['body']);
+				$username = $body->login;
+				$uid = $body->id;
+				
+				//get email
 				$res = $module->request(
 					"https://api.github.com/user/emails?access_token={$dto->response['access_token']}&scope=user,public_repo",
 					"get"
 				);
-				
-				$emails = (array) json_decode($res['body']);
+				$emails = (array) $res['body'];
 				break;
 			//end Github
 
@@ -321,25 +352,28 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 				$emails = array($profile->email);
 				$uid = array($profile->id);
 				$username = $profile->name;
-				$emails = array( json_decode($res['body'])->email );
 				break;
 			//end Google
 			
 			/**
-			 * Facebook 
+			 * MailChimp
 			 */
-			case 'facebook/index.php':
-				$res = $module->request(
-					"https://graph.facebook.com/me?access_token={$dto->response['access_token']}",
-					'get'
-				);
+			case 'mailchimp/index.php':
 				
+				$res = $module->request(
+						"getAccountDetails",
+						"post",
+						array(
+							'apikey' => $module->apikey
+						)
+					);
 				$body = json_decode($res['body']);
-				$uid = $body->id;
-				$emails = (array) $body->email;
+				$uid = $body->user_id;
 				$username = $body->username;
+				$emails = array($body->contact->email);
+				
 				break;
-			//end Facebook
+			//end mailchimp
 			
 			/**
 			 * Mailchimp
