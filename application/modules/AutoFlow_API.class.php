@@ -339,7 +339,6 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 				$emails = array($profile->email);
 				$uid = array($profile->id);
 				$username = $profile->name;
-				$emails = array( json_decode($res['body'])->email );
 				break;
 			//end Google
 			
@@ -347,7 +346,19 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			 * MailChimp
 			 */
 			case 'mailchimp/index.php':
-				ar_print($dto);
+				
+				$res = $module->request(
+						"getAccountDetails",
+						"post",
+						array(
+							'apikey' => $module->apikey
+						)
+					);
+				$body = json_decode($res['body']);
+				$uid = $body->user_id;
+				$username = $body->username;
+				$emails = array($body->contact->email);
+				
 				break;
 			//end mailchimp
 			
