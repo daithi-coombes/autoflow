@@ -259,6 +259,9 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		//make request for email
 		switch ($dto->slug) {
 			
+			/**
+			 * CityIndex
+			 */
 			case 'ci-login/index.php':
 				
 				$module->set_params($dto->response);
@@ -271,7 +274,11 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 				$username = $body->LogonUserName;
 				$emails = (array) $body->PersonalEmailAddress;
 				break;
+			//end cityindex
 			
+			/**
+			 * DropBox
+			 */
 			case 'dropbox/index.php':
 				
 				$module->set_params($dto->response);
@@ -285,6 +292,23 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 				$username = $body->display_name;
 				$emails = false;
 				break;
+			//end dropbox
+			
+			/**
+			 * Facebook 
+			 */
+			case 'facebook/index.php':
+				$res = $module->request(
+					"https://graph.facebook.com/me?access_token={$dto->response['access_token']}",
+					'get'
+				);
+				
+				$body = json_decode($res['body']);
+				$uid = $body->id;
+				$emails = (array) $body->email;
+				$username = $body->username;
+				break;
+			//end Facebook
 			
 			/**
 			 * Github 
@@ -320,20 +344,11 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			//end Google
 			
 			/**
-			 * Facebook 
+			 * MailChimp
 			 */
-			case 'facebook/index.php':
-				$res = $module->request(
-					"https://graph.facebook.com/me?access_token={$dto->response['access_token']}",
-					'get'
-				);
-				
-				$body = json_decode($res['body']);
-				$uid = $body->id;
-				$emails = (array) $body->email;
-				$username = $body->username;
+			case 'mailchimp/index.php':
 				break;
-			//end Facebook
+			//end mailchimp
 			
 			/**
 			 * Twitter 
