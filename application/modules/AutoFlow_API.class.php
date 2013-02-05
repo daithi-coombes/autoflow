@@ -259,6 +259,9 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		//make request for email
 		switch ($dto->slug) {
 			
+			/**
+			 * CityIndex
+			 */
 			case 'ci-login/index.php':
 				
 				$module->set_params($dto->response);
@@ -272,6 +275,9 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 				$emails = (array) $body->PersonalEmailAddress;
 				break;
 			
+			/**
+			 * Dropbox
+			 */
 			case 'dropbox/index.php':
 				
 				$module->set_params($dto->response);
@@ -334,6 +340,17 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 				$username = $body->username;
 				break;
 			//end Facebook
+			
+			/**
+			 * Mailchimp
+			 */
+			case 'mailchimp/index.php':
+				
+				ar_print("AutoFlow MailChimp");
+				ar_print($dto);
+				die();
+				
+				break;
 			
 			/**
 			 * Twitter 
