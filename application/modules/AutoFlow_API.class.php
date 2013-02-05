@@ -316,7 +316,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			case 'github/index.php':
 
 				$res = $module->request(
-					"https://api.github.com/user/emails?access_token={$dto->response['access_token']}&scope=user,public_repo",
+					"https://api.github.com/user?access_token={$dto->response['access_token']}&scope=user,public_repo",
 					"get"
 				);
 				
