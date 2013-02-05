@@ -347,6 +347,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			 * MailChimp
 			 */
 			case 'mailchimp/index.php':
+				ar_print($dto);
 				break;
 			//end mailchimp
 			
