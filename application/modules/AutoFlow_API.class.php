@@ -53,11 +53,13 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 	 * a new account for this social network. If there is no email
 	 * returned from the service then show form to grab email
 	 * @see AutoFlow_API::parse_dto()
+	 * @uses API_Con_Mngr_View To print the results
 	 * @link http://tommcfarlin.com/create-a-user-in-wordpress/
 	 */
 	public function create_account($email_address, $username, $slug, $uid){
 		
 		global $API_Connection_Manager;
+		$view = new API_Con_Mngr_View();
 		
 		$username = preg_replace("/[^a-zA-Z0-9\s\.-]+/", "", $username);
 		$username = preg_replace("/[\s\.-]+/", "_", $username); //str_replace(" ", "_", $username);
@@ -66,8 +68,11 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		// Generate the password and create the user
 		$user_id = wp_create_user( $username, $password, $email_address );
 
-		if(is_wp_error($user_id))
-			die($user_id->get_error_message ());
+		//if error creating user, print and die()
+		if(is_wp_error($user_id)){
+			$view->body[] = $user_id->get_error_message ();
+			$view->get_html();
+		}
 		
 		// Set the nickname
 		$user_data = wp_update_user(array(
@@ -86,27 +91,17 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		$service = $API_Connection_Manager->get_service($slug);
 		$service->login_connect($user_id,$uid);
 		
-		//print head
-		?><html><head><?php
-		wp_enqueue_style('media');
-		wp_enqueue_style('colors');
-		@wp_head();
-		?></head><?php
-		
-		//iframe body
-		?><body id="media-upload" class="js"><?php
-		
 		//if not userdata
 		if(!$user_data)
-			print "<h2>Error creating account</h2>";
+			$view->body[] = "<h2>Error creating account</h2>";
 		//success
 		else{
-			print "<h2>Your account has been created successfully</h2>";
-			print "<h4>Details, please store these safely:
+			$view->body[] = "<h2>Your account has been created successfully</h2>
+				<h4>Details, please store these safely:</h4>
 				<ul>
-					<li>Username: {$username}</li>
-					<li>Password: {$password}</li>
-					<li>Email: {$email_address}</li>
+					<li><b>Username</b>: {$username}</li>
+					<li><b>Password</b>: {$password}</li>
+					<li><b>Email</b>: {$email_address}</li>
 				</ul>
 				<a href=\"" . wp_login_url() . "\" title=\"Login\">Login</a>";
 
@@ -118,10 +113,9 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			update_option($this->option_name, $connections);
 			//end set service uid
 		}
-		//footer and die()
-		@wp_footer();
-		?></body></html><?php
-		die();
+		
+		//print html and die()
+		$view->get_html();
 	}
 	
 	/**
