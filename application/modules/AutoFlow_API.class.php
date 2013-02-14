@@ -347,7 +347,6 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			 * Google 
 			 */
 			case 'google/index.php':
-				
 				$res = $module->request(
 						"https://www.googleapis.com/oauth2/v1/userinfo?access_token={$dto->response['access_token']}",
 						"GET"
@@ -440,23 +439,55 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			}
 			//else print email form
 			else{
+				
+				//build up form
 				$nonce = wp_create_nonce("autoflow_get_email");
-				print "
-					<h3>AutoFLow Wordpress Social Login</h3>
-					<p>Creating new account...</p>
-					<form method=\"post\" action=\"".admin_url('admin-ajax.php')."?action=autoflow_api\">
-						<input type=\"hidden\" name=\"wp_nonce\" value=\"{$nonce}\"/>
-						<input type=\"hidden\" name=\"slug\" value=\"{$dto->slug}\"/>
-						<input type=\"hidden\" name=\"uid\" value=\"{$uid}\"/>
-						<input type=\"hidden\" name=\"username\" value=\"{$username}\"/>
-						<label>Please enter your email address:
-							<input type=\"text\" name=\"email\"/>
-						</label><br/>
-						<label>Re-enter email address:
-							<input type=\"text\" name=\"email2\"/>
-						</label><br/>
-						<input type=\"submit\" value=\"Create Account\"/>
+				$view = new API_Con_Mngr_View();
+				$view->body[] = "
+					<p class=\"lead\">
+						Creating new account. Please fill out the form below
+					</p>
+					
+					<form method=\"post\" class=\"form-horizontal\">
+						<fieldset>
+							<input type=\"hidden\" name=\"wp_nonce\" value=\"{$nonce}\"/>
+							<input type=\"hidden\" name=\"slug\" value=\"{$dto->slug}\"/>
+							<input type=\"hidden\" name=\"uid\" value=\"{$uid}\"/>
+							<input type=\"hidden\" name=\"username\" value=\"{$username}\"/>
+							<div class=\"control-group\">
+								<label class=\"control-label\" for=\"email\">
+									Email</label>
+								<div class=\"controls\">
+									<input type=\"email\" 
+										name=\"email\" 
+										id=\"email\" 
+										placeholder=\"Please enter your email\"
+										required/>
+								</div>
+							</div>
+							<div class=\"control-group\">
+								<label class=\"control-label\" for=\"email2\">
+									Re-Type Email</label>
+								<div class=\"controls\">
+									<input type=\"email\" 
+										name=\"email2\" 
+										id=\"email2\" 
+										placeholder=\"Please retype your email\"
+										data-validation-matches-match=\"email\"
+										data-validation-matches-message=\"Must match email address entered above\"
+										/>
+								</div>
+							</div>
+							<div class=\"control-group\">
+								<div class=\"controls\">
+									<button type=\"submit\" class=\"btn\">Sign In</button>
+								</div>
+							</div>
+						</fieldset>
 					</form>";
+					
+				//print html and die()
+				$view->get_html();
 				die();
 			}
 			//end Create new account
