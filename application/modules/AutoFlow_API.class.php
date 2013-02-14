@@ -96,14 +96,32 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			$view->body[] = "<h2>Error creating account</h2>";
 		//success
 		else{
-			$view->body[] = "<h2>Your account has been created successfully</h2>
-				<h4>Details, please store these safely:</h4>
-				<ul>
-					<li><b>Username</b>: {$username}</li>
-					<li><b>Password</b>: {$password}</li>
-					<li><b>Email</b>: {$email_address}</li>
-				</ul>
-				<a href=\"" . wp_login_url() . "\" title=\"Login\">Login</a>";
+			$view->body[] = "
+				<p class=\"lead\">
+					Your account has been created successfully, please take note of your
+					details below and click the link to login
+				</p>
+
+				<table class=\"table\">
+					<tbody>
+						<tr>
+							<th>Username</th>
+							<td>{$username}</td>
+						</tr>
+						<tr>
+							<th>Password</th>
+							<td>{$password}</td>
+						</tr>
+						<tr>
+							<th>Email</th>
+							<td>{$email_address}</td>
+						</tr>
+					</tbody>
+				</table>
+				<a href=\"" . wp_login_url() . "\" 
+				   title=\"Login\"
+				   class=\"btn btn-large btn-primary\">
+			Login</a>";
 
 			/**
 			* Set service uid to newly created user for future logins.
@@ -259,14 +277,8 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			case 'ci-login/index.php':
 				
 				$module->set_params($dto->response);
-				$res = $module->request(
-						'/UserAccount/ClientAndTradingAccount',
-						'get'
-				);
-				$body = json_decode($res['body']);
-				$uid = $body->ClientAccountId;
-				$username = $body->LogonUserName;
-				$emails = (array) $body->PersonalEmailAddress;
+				$username = $uid = $module->get_uid();
+				$emails = false;
 				break;
 			//end cityindex
 			
