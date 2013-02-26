@@ -141,9 +141,11 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 	 */
 	public function disconnect(){
 		$user_id = $this->api->get_current_user()->ID;
-		$meta = get_option($this->option_name, array());
+		$meta = get_option("API_Con_Mngr_Module-connections", array());
 		unset($meta[$_REQUEST['slug']][$user_id]);
-		update_option($this->option_name, $meta);
+		if(empty($meta[$_REQUEST['slug']]))
+			unset($meta[$_REQUEST['slug']]);
+		update_option("API_Con_Mngr_Module-connections", $meta);
 	}
 	
 	/**
@@ -211,7 +213,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			if($valid)
 				$html .= "
 					<form method=\"post\">
-						<input type=\"hidden\" name=\"action\" value=\"disconnect\"/>
+						<input type=\"hidden\" name=\"autoflow_action\" value=\"disconnect\"/>
 						<input type=\"hidden\" name=\"slug\" value=\"{$slug}\"/>
 						<input type=\"submit\" value=\"Disconnect\"/>
 					</form>";
