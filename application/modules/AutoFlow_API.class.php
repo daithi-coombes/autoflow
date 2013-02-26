@@ -21,7 +21,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		
 		global $API_Connection_Manager;
 		$this->api = $API_Connection_Manager;
-		$action = @$_REQUEST['action'];
+		$action = @$_REQUEST['autoflow_action'];
 		
 		if($action)
 			if(method_exists($this, $action))
