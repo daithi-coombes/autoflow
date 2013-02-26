@@ -454,6 +454,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 							<input type=\"hidden\" name=\"slug\" value=\"{$dto->slug}\"/>
 							<input type=\"hidden\" name=\"uid\" value=\"{$uid}\"/>
 							<input type=\"hidden\" name=\"username\" value=\"{$username}\"/>
+							<input type=\"hidden\" name=\"autoflow_action\" value=\"email_form_callback\"/>
 							<div class=\"control-group\">
 								<label class=\"control-label\" for=\"email\">
 									Email</label>
