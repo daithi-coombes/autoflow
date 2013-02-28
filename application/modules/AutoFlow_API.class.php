@@ -285,11 +285,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			//end cityindex
 			
 			/**
-<<<<<<< HEAD
 			 * Dropbox
-=======
-			 * DropBox
->>>>>>> dev
 			 */
 			case 'dropbox/index.php':
 				
@@ -384,7 +380,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			
 			/**
 			 * Mailchimp
-			 */
+			 *
 			case 'mailchimp/index.php':
 				
 				ar_print("AutoFlow MailChimp");
@@ -392,6 +388,8 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 				die();
 				
 				break;
+			 * 
+			 */
 			
 			/**
 			 * Twitter 
