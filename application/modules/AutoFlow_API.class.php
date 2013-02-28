@@ -69,17 +69,6 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		// Generate the password and create the user
 		$user_id = wp_create_user( $username, $password, $email_address );
 
-		//if error creating user, print and die()
-		if(is_wp_error($user_id)){
-			$view->body[] = $user_id->get_error_message ();
-			$view->body[] = "
-				<a href=\"" . wp_login_url() . "\" 
-				   title=\"Login\"
-				   class=\"btn btn-large btn-primary\">
-				Login</a>";
-			$view->get_html();
-		}
-		
 		// Set the nickname
 		$user_data = wp_update_user(array(
 			'ID' => $user_id,
@@ -90,44 +79,14 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		$user = new WP_User( $user_id );
 		$user->set_role( $this->new_user_role ); //'contributor' );
 
-		// Email the user
-		wp_mail( $email_address, 'Welcome!', 'Your Password: ' . $password );
-		
 		//link up user with module uid
 		$service = $API_Connection_Manager->get_service($slug);
 		$service->login_connect($user_id,$uid);
 		
-		//if not userdata
-		if(!$user_data)
-			$view->body[] = "<h2>Error creating account</h2>";
-		//success
-		else{
-			$view->body[] = "
-				<p class=\"lead\">
-					Your account has been created successfully, please take note of your
-					details below and click the link to login
-				</p>
-
-				<table class=\"table\">
-					<tbody>
-						<tr>
-							<th>Username</th>
-							<td>{$username}</td>
-						</tr>
-						<tr>
-							<th>Password</th>
-							<td>{$password}</td>
-						</tr>
-						<tr>
-							<th>Email</th>
-							<td>{$email_address}</td>
-						</tr>
-					</tbody>
-				</table>
-				<a href=\"" . wp_login_url() . "\" 
-				   title=\"Login\"
-				   class=\"btn btn-large btn-primary\">
-			Login</a>";
+		/**
+		 * user created successfully
+		 */
+		if($user_data && !is_wp_error($user_id)){
 
 			/**
 			* Set service uid to newly created user for future logins.
@@ -136,9 +95,27 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			$connections[$slug][$user_id] = $uid;
 			update_option($this->option_name, $connections);
 			//end set service uid
+			
+			//login user
+			wp_set_current_user( $user_id, $username );
+			wp_set_auth_cookie( $user_id );
+			do_action( 'wp_login', $username );
+			wp_redirect( admin_url() );
+			exit;
 		}
+		//end user created successfully
 		
-		//print html and die()
+		
+		//default print error
+		$view->body[] = "<h2>Error creating account</h2>";
+		//if error creating user, print and die()
+		if(is_wp_error($user_id))
+			$view->body[] = $user_id->get_error_message ();
+		$view->body[] = "
+			<a href=\"" . wp_login_url() . "\" 
+			   title=\"Login\"
+			   class=\"btn btn-large btn-primary\">
+			Login</a>";
 		$view->get_html();
 	}
 	
