@@ -78,6 +78,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 				   class=\"btn btn-large btn-primary\">
 				Login</a>";
 			$view->get_html();
+			die();
 		}
 		
 		// Set the nickname
