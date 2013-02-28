@@ -69,6 +69,21 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		// Generate the password and create the user
 		$user_id = wp_create_user( $username, $password, $email_address );
 
+<<<<<<< HEAD
+=======
+		//if error creating user, print and die()
+		if(is_wp_error($user_id)){
+			$view->body[] = $user_id->get_error_message ();
+			$view->body[] = "
+				<a href=\"" . wp_login_url() . "\" 
+				   title=\"Login\"
+				   class=\"btn btn-large btn-primary\">
+				Login</a>";
+			$view->get_html();
+			die();
+		}
+		
+>>>>>>> dev
 		// Set the nickname
 		$user_data = wp_update_user(array(
 			'ID' => $user_id,
