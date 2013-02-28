@@ -72,6 +72,11 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		//if error creating user, print and die()
 		if(is_wp_error($user_id)){
 			$view->body[] = $user_id->get_error_message ();
+			$view->body[] = "
+				<a href=\"" . wp_login_url() . "\" 
+				   title=\"Login\"
+				   class=\"btn btn-large btn-primary\">
+				Login</a>";
 			$view->get_html();
 		}
 		
