@@ -58,12 +58,13 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 	 */
 	public function create_account($email_address, $username, $slug, $uid){
 		
+		//vars
 		global $API_Connection_Manager;
 		$view = new API_Con_Mngr_View();
-		
-		$username = preg_replace("/[^a-zA-Z0-9\s\.-]+/", "", $username);
-		$username = preg_replace("/[\s\.-]+/", "_", $username); //str_replace(" ", "_", $username);
+		$username = wp_generate_password(6);
 		$password = wp_generate_password( 12, false );
+		while(username_exists($username))	//make sure username is unique
+			$username = wp_generate_password(6);
 		
 		// Generate the password and create the user
 		$user_id = wp_create_user( $username, $password, $email_address );
