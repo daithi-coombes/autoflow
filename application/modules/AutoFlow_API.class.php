@@ -61,7 +61,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		//vars
 		global $API_Connection_Manager;
 		$view = new API_Con_Mngr_View();
-		$username = wp_generate_password(6);
+		$username = wp_generate_password(6, false);
 		$password = wp_generate_password( 12, false );
 		while(username_exists($username))	//make sure username is unique 
 			$username = wp_generate_password(6);
