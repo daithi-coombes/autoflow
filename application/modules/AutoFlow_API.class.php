@@ -36,13 +36,14 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		add_action('admin_menu', array(&$this, 'get_menu'));
 		
 		/**
-		 * add login form hook
-		 * login form error messages hook
-		 * add shortcode for custom theme forms
+		 * login form hooks
 		 */
 		add_action( 'login_footer', array( &$this, 'print_login_buttons' ) );
 		//add_filter( 'login_message', array(&$this, 'print_login_errors' ) );
 		add_shortcode( 'AutoFlow', array( &$this, 'print_login_buttons' ) );
+		
+		//set redirect
+		add_action('init', array( &$this, 'set_redirect'));
 		
 		parent::__construct( get_class($this));
 	}
@@ -87,10 +88,6 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			'nickname' => $username
 		));
 
-		// Set the role
-		$user = new WP_User( $user_id );
-		$user->set_role( $this->new_user_role ); //'contributor' );
-
 		//link up user with module uid
 		$service = $API_Connection_Manager->get_service($slug);
 		$service->login_connect($user_id,$uid);
@@ -99,6 +96,10 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		 * user created successfully
 		 */
 		if($user_data && !is_wp_error($user_id)){
+
+			// Set the role
+			$user = new WP_User( $user_id );
+			$user->set_role( $this->new_user_role ); //'contributor' );
 
 			/**
 			* Set service uid to newly created user for future logins.
@@ -112,7 +113,10 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			wp_set_current_user( $user_id, $username );
 			wp_set_auth_cookie( $user_id );
 			do_action( 'wp_login', $username );
-			wp_redirect( admin_url() );
+			if(isset($_SESSION['Autoflow_redirect']))
+				wp_redirect ($_SESSION['Autoflow_redirect']);
+			else
+				wp_redirect( admin_url() );
 			exit;
 		}
 		//end user created successfully
@@ -489,5 +493,19 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			//end Create new account
 				
 		}		
+	}
+	
+	/**
+	 * Sets the redirect_to.
+	 * 
+	 * After a successfull login the user will be redirected to their initial
+	 * request.
+	 */
+	public function set_redirect(){
+		
+		if(basename(wp_login_url()) != $GLOBALS['pagenow'])
+			$_SESSION['Autoflow_redirect'] = $_SERVER['REQUEST_URI'];
+		elseif(isset($_REQUEST['redirect_uri']))
+			$_SESSION['Autoflow_redirect'] = $_REQUEST['redirect_uri'];
 	}
 }
