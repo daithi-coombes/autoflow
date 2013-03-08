@@ -33,7 +33,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		
 		//add settings page
 		add_action('wp_ajax_nopriv_autoflow_api', array(&$this, 'email_form_callback'));
-		add_action('admin_menu', array(&$this, 'get_menu'));
+		//add_action('admin_menu', array(&$this, 'get_menu'));
 		
 		/**
 		 * login form hooks
@@ -166,6 +166,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 	
 	/**
 	 * Build the admin menu 
+	 * @depcrated
 	 */
 	public function get_menu(){
 		add_menu_page("AutoFlow", "AutoFlow", "read", "autoflow", array(&$this, 'get_page'));
