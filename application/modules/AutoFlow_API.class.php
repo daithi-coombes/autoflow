@@ -31,14 +31,17 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			'list services' => array(&$this, 'list_services')
 		);
 		
-		//add settings page
+		//actions
 		add_action('wp_ajax_nopriv_autoflow_api', array(&$this, 'email_form_callback'));
 		//add_action('admin_menu', array(&$this, 'get_menu'));
 		
 		/**
 		 * login form hooks
 		 */
+		add_action('login_enqueue_scripts', array(&$this, 'get_styles'));
 		add_action( 'login_footer', array( &$this, 'print_login_buttons' ) );
+		//add_action( 'login_form', array( &$this, 'print_login_buttons' ) );
+		//add_filter( 'login_message', array(&$this, 'get_login_buttons' ) );
 		//add_filter( 'login_message', array(&$this, 'print_login_errors' ) );
 		add_shortcode( 'AutoFlow', array( &$this, 'print_login_buttons' ) );
 		
@@ -168,6 +171,30 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		die();
 	}
 	
+	public function get_styles(){
+		?>
+		<style type="text/css">
+			div#login form#loginform, div#login p#nav {
+				display: none;
+			}
+			div#autoflow-links{
+				text-align: center;
+			}
+			div#autoflow-links h2{
+				margin: 20px auto 0 auto;
+			}
+			div#autoflow-links ul{
+				max-width: 800px;
+				margin: 15px auto;
+			}
+			div#autoflow-links ul li{
+				float: left;
+				margin: 10px 25px;
+			}
+		</style>
+		<?php
+	}
+	
 	/**
 	 * Build the admin menu 
 	 * @depcrated
@@ -245,14 +272,22 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		
 		//vars
 		$services = $this->api->get_services();
-		$res = "<ul>\n";
+		$res = "<div id=\"autoflow-links\">
+			<h2>Connect with...</h2>
+			<ul>\n";
 		
 		//build list of buttons
 		foreach($services as $slug => $service)
-				$res .= "<li><a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\">Login with {$service->Name}</a></li>\n";
+				//$res .= "<li><a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\">Login with {$service->Name}</a></li>\n";
+				$res .= "<li>
+					<a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\" border=\"0\">
+						{$service->button}<br/>
+						{$service->Name}
+					</a></li>\n";
 		
-		//print result
-		print "{$res}\n</ul>\n";
+		//print/return result
+		$res = "{$res}\n</ul>\n</div>\n";
+		print $res;
 	}
 	
 	/**
