@@ -305,8 +305,11 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			 * Facebook 
 			 */
 			case 'facebook/index.php':
+				$module->set_params(array(
+					'access_token' => $dto->response['access_token']
+				));
 				$res = $module->request(
-					"https://graph.facebook.com/me?access_token={$dto->response['access_token']}",
+					"https://graph.facebook.com/me",
 					'get'
 				);
 				
