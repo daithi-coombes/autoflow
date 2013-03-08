@@ -113,10 +113,14 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 			wp_set_current_user( $user_id, $username );
 			wp_set_auth_cookie( $user_id );
 			do_action( 'wp_login', $username );
+			wp_redirect( admin_url() . "admin.php?page=api-connection-manager-user" );
+			/***
 			if(isset($_SESSION['Autoflow_redirect']))
 				wp_redirect ($_SESSION['Autoflow_redirect']);
 			else
-				wp_redirect( admin_url() );
+				wp_redirect( admin_url() . "admin.php?page=api-connection-manager-user" );
+			 * 
+			 */
 			exit;
 		}
 		//end user created successfully
