@@ -1,9 +1,9 @@
 <?php
 
 //include api-connection-manager class
-require_once( WP_PLUGIN_DIR . "/api-connection-manager/class-api-connection-manager.php");
+//require_once( WP_PLUGIN_DIR . "/api-connection-manager/class-api-connection-manager.php");
 
-class AutoFlow_API extends WPPluginFrameWorkController{
+class AutoFlow_API{
 
 	/** @var string The role assigned to new users */
 	public $new_user_role = "subscriber";
@@ -48,7 +48,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		//set redirect
 		add_action('init', array( &$this, 'set_redirect'));
 		
-		parent::__construct( get_class($this));
+		//parent::__construct( get_class($this));
 	}
 	
 	/**
