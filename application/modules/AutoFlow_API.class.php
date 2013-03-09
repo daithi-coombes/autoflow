@@ -93,12 +93,12 @@ class AutoFlow_API{
 
 		//link up user with module uid
 		$service = $API_Connection_Manager->get_service($slug);
-		$service->login_connect($user_id,$uid);
+		$login = $service->login_connect($user_id,$uid);
 		
 		/**
 		 * user created successfully
 		 */
-		if($user_data && !is_wp_error($user_id)){
+		if($user_data && !is_wp_error($user_id) && !is_wp_error($login)){
 
 			// Set the role
 			$user = new WP_User( $user_id );
@@ -134,6 +134,8 @@ class AutoFlow_API{
 		//if error creating user, print and die()
 		if(is_wp_error($user_id))
 			$view->body[] = $user_id->get_error_message ();
+		if(is_wp_error($login))
+			$view->body[] = $login->get_error_message();
 		$view->body[] = "
 			<a href=\"" . wp_login_url() . "\" 
 			   title=\"Login\"
