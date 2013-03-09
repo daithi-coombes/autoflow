@@ -471,12 +471,18 @@ class AutoFlow_API{
 		 * If logged in user then connect the account.
 		 * Request must be from dashboard autoflow settings page.
 		 */
-		if(!$module->login($uid))
-
+		$login = $module->login($uid);
+		
+		//if error logging in
+		if(is_wp_error($login)){
+			ar_print($login);
+			die();
+		}
+		
 		/**
 		 * If no logged in user then create new account
 		 */
-		{	
+		elseif(!$login){	
 			/**
 			 * Create new account 
 			 */
