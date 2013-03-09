@@ -400,7 +400,7 @@ class AutoFlow_API{
 				
 				$profile = json_decode($res['body']);
 				$emails = array($profile->email);
-				$uid = array($profile->id);
+				$uid = $profile->id;
 				$username = $profile->name;
 				break;
 			//end Google
