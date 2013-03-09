@@ -205,6 +205,7 @@ class AutoFlow_API{
 	
 	/**
 	 * Callback for displaying the html in the dashboard settings page
+	 * @deprecated Replaced by the API Con User Connections page
 	 * @global API_Connection_Manager $API_Connection_Manager
 	 * @global type $current_user
 	 * @return type 
@@ -216,7 +217,11 @@ class AutoFlow_API{
 		
 		$count=1;
 		$html = "<div id=\"dashboard-widgets\" class=\"metabox-holder columns-1\">\n";
-		$meta = get_option("API_Con_Mngr_Module-connections", array());
+		if(is_multisite())
+			$meta = get_site_option("API_Con_Mngr_Module-connections", array());
+		else
+			$meta = get_option("API_Con_Mngr_Module-connections", array());
+		//$meta = get_option("API_Con_Mngr_Module-connections", array());
 		$modules = $API_Connection_Manager->get_services();
 		
 		foreach($modules as $slug=>$module){
