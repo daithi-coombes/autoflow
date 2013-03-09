@@ -177,7 +177,7 @@ class AutoFlow_API{
 		?>
 		<style type="text/css">
 			div#login form#loginform, div#login p#nav {
-				display: none;
+				/*display: none;*/
 			}
 			div#autoflow-links{
 				text-align: center;
