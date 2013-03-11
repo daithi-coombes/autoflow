@@ -42,7 +42,7 @@ class AutoFlow_API{
 		add_action( 'login_footer', array( &$this, 'print_login_buttons' ) );
 		//add_action( 'login_form', array( &$this, 'print_login_buttons' ) );
 		//add_filter( 'login_message', array(&$this, 'get_login_buttons' ) );
-		//add_filter( 'login_message', array(&$this, 'print_login_errors' ) );
+		add_filter( 'login_message', array(&$this, 'print_login_errors' ) );
 		add_shortcode( 'AutoFlow', array( &$this, 'print_login_buttons' ) );
 		
 		//set redirect
@@ -295,6 +295,14 @@ class AutoFlow_API{
 		//print/return result
 		$res = "{$res}\n</ul>\n</div>\n";
 		print $res;
+	}
+	
+	public function print_login_errors(){
+		if(count(@$_SESSION['Api-Con-Errors']))
+			foreach($_SESSION['Api-Con-Errors'] as $err)
+				print "<p class=\"message\">{$err}</p>\n";
+				
+		unset($_SESSION['Api-Con-Errors']);
 	}
 	
 	/**
