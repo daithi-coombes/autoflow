@@ -91,9 +91,13 @@ class AutoFlow_API{
 			'nickname' => $username
 		));
 
-		//link up user with module uid
+		//link up user with module uid and set tokens
 		$service = $API_Connection_Manager->get_service($slug);
+		$tokens = $_SESSION['Autoflow-tokens'];
+		unset($_SESSION['Autoflow-tokens']);
 		$login = $service->login_connect($user_id,$uid);
+		$service->user = get_userdata($user_id);
+		$service->set_params($tokens);
 		
 		/**
 		 * user created successfully
@@ -500,7 +504,11 @@ class AutoFlow_API{
 		/**
 		 * If no logged in user then create new account
 		 */
-		elseif(!$login){	
+		elseif(!$login){
+			
+			//store tokens as session
+			$_SESSION['Autoflow-tokens'] = $dto->response;
+			
 			/**
 			 * Create new account 
 			 */
@@ -526,6 +534,7 @@ class AutoFlow_API{
 							<input type=\"hidden\" name=\"uid\" value=\"{$uid}\"/>
 							<input type=\"hidden\" name=\"username\" value=\"{$username}\"/>
 							<input type=\"hidden\" name=\"autoflow_action\" value=\"email_form_callback\"/>
+							<input type=\"hidden\" name=\"api-con-mngr\" value=\"false\"/>
 							<div class=\"control-group\">
 								<label class=\"control-label\" for=\"email\">
 									Email</label>
