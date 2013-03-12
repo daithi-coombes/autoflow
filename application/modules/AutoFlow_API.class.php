@@ -297,10 +297,18 @@ class AutoFlow_API{
 		print $res;
 	}
 	
+	/**
+	 * Handles errors reported by api-con-mngr.
+	 * Api Con will store errors in $_SESSION, print error box and reset session
+	 */
 	public function print_login_errors(){
-		if(count(@$_SESSION['Api-Con-Errors']))
+		if(count(@$_SESSION['Api-Con-Errors'])){
+			$html = "<div id=\"login_error\">\n<ul>\n";
 			foreach($_SESSION['Api-Con-Errors'] as $err)
-				print "<p class=\"message\">{$err}</p>\n";
+				$html .= "<li>{$err}</li>\n";
+			print "{$html}</ul>\n</div>\n";
+			wp_shake_js();
+		}
 				
 		unset($_SESSION['Api-Con-Errors']);
 	}
