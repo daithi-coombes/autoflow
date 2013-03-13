@@ -103,9 +103,10 @@ class AutoFlow_API{
 		$service->set_params($tokens);
 		
 		//look for custom params taken during authentication
-		if($_REQUEST['extra_params'])
+		if(@$_REQUEST['extra_params']){
 			$extra_params = (array) json_decode(urldecode($_REQUEST['extra_params']));
-		$service->set_params($extra_params);
+			$service->set_params($extra_params);
+		}
 		
 		/**
 		 * user created successfully
@@ -478,6 +479,7 @@ class AutoFlow_API{
 				$body = $module->parse_response($res);
 				$uid = $body->id;
 				$username = $body->screen_name;
+				list($firstname, $surname) = @explode(" ", $body->name, 2);
 				$emails = false;
 				break;
 			
