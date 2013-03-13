@@ -431,7 +431,9 @@ class AutoFlow_API{
 				
 				
 				$profile = json_decode($res['body']);
-				$emails = array($profile->email);
+				$email = $profile->email;
+				$firstname = $profile->given_name;
+				$surname = $profile->family_name;
 				$uid = $profile->id;
 				$username = $profile->name;
 				break;
