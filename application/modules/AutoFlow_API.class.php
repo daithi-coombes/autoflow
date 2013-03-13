@@ -102,6 +102,11 @@ class AutoFlow_API{
 		$service->user = get_userdata($user_id);
 		$service->set_params($tokens);
 		
+		//look for custom params taken during authentication
+		if($_REQUEST['extra_params'])
+			$extra_params = (array) json_decode(urldecode($_REQUEST['extra_params']));
+		$service->set_params($extra_params);
+		
 		/**
 		 * user created successfully
 		 */
@@ -524,7 +529,7 @@ class AutoFlow_API{
 						
 			//extra params for custom services
 			if(count($extra_params)){
-				$encoded_params = serialize($extra_params);
+				$encoded_params = urlencode(json_encode($extra_params));
 				$view->body[] = "
 						<input type=\"hidden\" name=\"extra_params\" value=\"{$encoded_params}\"/>\n";
 			}//end extra params for custom services
