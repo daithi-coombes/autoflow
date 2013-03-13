@@ -454,7 +454,9 @@ class AutoFlow_API{
 				$body = json_decode($res['body']);
 				$uid = $body->user_id;
 				$username = $body->username;
-				$emails = array($body->contact->email);
+				$firstname = $body->contact->fname;
+				$surname = $body->contact->lname;
+				$email = $body->contact->email;
 				
 				break;
 			//end mailchimp
