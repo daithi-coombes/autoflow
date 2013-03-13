@@ -384,7 +384,7 @@ class AutoFlow_API{
 				
 				$body = json_decode($res['body']);
 				$uid = $body->id;
-				$emails = (array) $body->email;
+				$email = $body->email;
 				$username = $body->username;
 				$firstname = $body->first_name;
 				$surname = $body->last_name;
