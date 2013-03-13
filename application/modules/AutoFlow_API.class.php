@@ -403,14 +403,20 @@ class AutoFlow_API{
 				);
 				$body = json_decode($res['body']);
 				$username = $body->login;
+				list($firstname, $surname) = explode(" ", $body->name, 1);
 				$uid = $body->id;
+				$email = $body->email;
 				
-				//get email
+				/**
+				 * get email
+				 *
 				$res = $module->request(
 					"https://api.github.com/user/emails?access_token={$dto->response['access_token']}&scope=user,public_repo",
 					"get"
 				);
 				$emails = (array) $res['body'];
+				 * 
+				 */
 				break;
 			//end Github
 
@@ -571,7 +577,7 @@ class AutoFlow_API{
 						</div>
 						<div class=\"control-group\">
 							<div class=\"controls\">
-								<button type=\"submit\" class=\"btn\">Sign In</button>
+								<button type=\"submit\" class=\"btn\">Create Account</button>
 							</div>
 						</div>
 					</fieldset>
