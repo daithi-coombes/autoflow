@@ -386,6 +386,8 @@ class AutoFlow_API{
 				$uid = $body->id;
 				$emails = (array) $body->email;
 				$username = $body->username;
+				$firstname = $body->first_name;
+				$surname = $body->last_name;
 				break;
 			//end Facebook
 			
@@ -524,14 +526,14 @@ class AutoFlow_API{
 							<label class=\"control-label\" for=\"firstname\">
 								Firstname</label>
 							<div class=\"controls\">
-								<input type=\"text\" name=\"firstname\" id=\"firstname\" placeholder=\"Please enter your firstname\" required/>
+								<input type=\"text\" name=\"firstname\" id=\"firstname\" value=\"{$firstname}\" placeholder=\"Please enter your firstname\" required/>
 							</div>
 						</div>
 						<div class=\"control-group\">
 							<label class=\"control-label\" for=\"Surname\">
 								Surname</label>
 							<div class=\"controls\">
-								<input type=\"text\" name=\"surname\" id=\"surname\" placeholder=\"Please enter your surname\" required/>
+								<input type=\"text\" name=\"surname\" id=\"surname\" value=\"{$surname}\" placeholder=\"Please enter your surname\" required/>
 							</div>
 						</div>
 						<div class=\"control-group\">
