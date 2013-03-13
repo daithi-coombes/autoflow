@@ -337,6 +337,7 @@ class AutoFlow_API{
 		
 		global $API_Connection_Manager;
 		$module = $API_Connection_Manager->get_service($dto->slug);
+		$extra_params = array();
 		
 		//make request for email
 		switch ($dto->slug) {
@@ -452,6 +453,7 @@ class AutoFlow_API{
 						)
 					);
 				$body = json_decode($res['body']);
+				$extra_params['api_endpoint'] = $module->api_endpoint;
 				$uid = $body->user_id;
 				$username = $body->username;
 				$firstname = $body->contact->fname;
@@ -460,19 +462,6 @@ class AutoFlow_API{
 				
 				break;
 			//end mailchimp
-			
-			/**
-			 * Mailchimp
-			 *
-			case 'mailchimp/index.php':
-				
-				ar_print("AutoFlow MailChimp");
-				ar_print($dto);
-				die();
-				
-				break;
-			 * 
-			 */
 			
 			/**
 			 * Twitter 
@@ -531,7 +520,16 @@ class AutoFlow_API{
 						<input type=\"hidden\" name=\"uid\" value=\"{$uid}\"/>
 						<input type=\"hidden\" name=\"username\" value=\"{$username}\"/>
 						<input type=\"hidden\" name=\"autoflow_action\" value=\"new_acc_form_callback\"/>
-						<input type=\"hidden\" name=\"api-con-mngr\" value=\"false\"/>
+						<input type=\"hidden\" name=\"api-con-mngr\" value=\"false\"/>";
+						
+			//extra params for custom services
+			if(count($extra_params)){
+				$encoded_params = serialize($extra_params);
+				$view->body[] = "
+						<input type=\"hidden\" name=\"extra_params\" value=\"{$encoded_params}\"/>\n";
+			}//end extra params for custom services
+			
+			$view->body[] = @"			
 						<div class=\"control-group\">
 							<label class=\"control-label\" for=\"firstname\">
 								Firstname</label>
