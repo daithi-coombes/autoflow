@@ -60,7 +60,7 @@ class AutoFlow_API{
 	 * @uses API_Con_Mngr_View To print the results
 	 * @link http://tommcfarlin.com/create-a-user-in-wordpress/
 	 */
-	public function create_account($email_address, $username, $slug, $uid){
+	public function create_account($user_data, $slug, $uid){
 		
 		//vars
 		global $API_Connection_Manager;
@@ -71,7 +71,7 @@ class AutoFlow_API{
 			$username = wp_generate_password(6);
 		
 		// Generate the password and create the user
-		$user_id = wp_create_user( $username, $password, $email_address );
+		$user_id = wp_create_user( $username, $password, $user_data['email'] );
 
 		//if error creating user, print and die()
 		if(is_wp_error($user_id)){
@@ -88,7 +88,10 @@ class AutoFlow_API{
 		// Set the nickname
 		$user_data = wp_update_user(array(
 			'ID' => $user_id,
-			'nickname' => $username
+			'nickname' => $user_data['nickname'],
+			'display_name' => $user_data['nickname'],
+			'first_name' => $user_data['firstname'],
+			'last_name' => $user_data['surname']
 		));
 
 		//link up user with module uid and set tokens
@@ -121,14 +124,7 @@ class AutoFlow_API{
 			wp_set_auth_cookie( $user_id );
 			do_action( 'wp_login', $username );
 			wp_redirect( admin_url() . "admin.php?page=api-connection-manager-user" );
-			/***
-			if(isset($_SESSION['Autoflow_redirect']))
-				wp_redirect ($_SESSION['Autoflow_redirect']);
-			else
-				wp_redirect( admin_url() . "admin.php?page=api-connection-manager-user" );
-			 * 
-			 */
-			exit;
+			die();
 		}
 		//end user created successfully
 		
@@ -146,6 +142,7 @@ class AutoFlow_API{
 			   class=\"btn btn-large btn-primary\">
 			Login</a>";
 		$view->get_html();
+		die();
 	}
 	
 	/**
@@ -163,7 +160,7 @@ class AutoFlow_API{
 	/**
 	 * Process form requesting email address and then create new account.
 	 */
-	public function email_form_callback(){
+	public function new_acc_form_callback(){
 		
 		//check nonce
 		if(!wp_verify_nonce($_REQUEST['wp_nonce'],"autoflow_get_email"))
@@ -173,7 +170,12 @@ class AutoFlow_API{
 			die("Emails don't match");
 		
 		//create account and die
-		$this->create_account($_REQUEST['email'], $_REQUEST['username'], $_REQUEST['slug'], $_REQUEST['uid']);
+		$this->create_account(array(
+				'firstname' => $_REQUEST['firstname'],
+				'surname' => $_REQUEST['surname'],
+				'email' => $_REQUEST['email'],
+				'nickname' => $_REQUEST['nickname']
+			), $_REQUEST['slug'], $_REQUEST['uid']);
 		die();
 	}
 	
@@ -495,23 +497,89 @@ class AutoFlow_API{
 		 */
 		$login = $module->login($uid);
 		
-		//if error logging in
-		if(is_wp_error($login)){
-			ar_print($login);
-			die();
-		}
-		
 		/**
 		 * If no logged in user then create new account
 		 */
-		elseif(!$login){
+		if(!$login){
 			
 			//store tokens as session
 			$_SESSION['Autoflow-tokens'] = $dto->response;
 			
+			$nonce = wp_create_nonce("autoflow_get_email");
+			$view = new API_Con_Mngr_View();
+			$view->body[] = @"
+				<p class=\"lead\">
+					Creating new account. Please fill out the form below
+				</p>
+				
+				<form method=\"post\" class=\"form-horizontal\">
+					<fieldset>
+						<input type=\"hidden\" name=\"wp_nonce\" value=\"{$nonce}\"/>
+						<input type=\"hidden\" name=\"slug\" value=\"{$dto->slug}\"/>
+						<input type=\"hidden\" name=\"uid\" value=\"{$uid}\"/>
+						<input type=\"hidden\" name=\"username\" value=\"{$username}\"/>
+						<input type=\"hidden\" name=\"autoflow_action\" value=\"new_acc_form_callback\"/>
+						<input type=\"hidden\" name=\"api-con-mngr\" value=\"false\"/>
+						<div class=\"control-group\">
+							<label class=\"control-label\" for=\"firstname\">
+								Firstname</label>
+							<div class=\"controls\">
+								<input type=\"text\" name=\"firstname\" id=\"firstname\" placeholder=\"Please enter your firstname\" required/>
+							</div>
+						</div>
+						<div class=\"control-group\">
+							<label class=\"control-label\" for=\"Surname\">
+								Surname</label>
+							<div class=\"controls\">
+								<input type=\"text\" name=\"surname\" id=\"surname\" placeholder=\"Please enter your surname\" required/>
+							</div>
+						</div>
+						<div class=\"control-group\">
+							<label class=\"control-label\" for=\"nickname\">
+								Nickname</label>
+							<div class=\"controls\">
+								<input type=\"text\" name=\"nickname\" id=\"nickname\" value=\"{$username}\" placeholder=\"Please enter your nickanme\" required/>
+							</div>
+						</div>
+						<div class=\"control-group\">
+							<label class=\"control-label\" for=\"email\">
+								Email</label>
+							<div class=\"controls\">
+								<input type=\"email\" 
+									name=\"email\" 
+									id=\"email\" 
+									value=\"{$email}\"
+									placeholder=\"Please enter your email\"
+									required/>
+							</div>
+						</div>
+						<div class=\"control-group\">
+							<label class=\"control-label\" for=\"email2\">
+								Re-Type Email</label>
+							<div class=\"controls\">
+								<input type=\"email\" 
+									name=\"email2\" 
+									id=\"email2\" 
+									value=\"{$email}\"
+									placeholder=\"Please retype your email\"
+									data-validation-matches-match=\"email\"
+									data-validation-matches-message=\"Must match email address entered above\"
+									/>
+							</div>
+						</div>
+						<div class=\"control-group\">
+							<div class=\"controls\">
+								<button type=\"submit\" class=\"btn\">Sign In</button>
+							</div>
+						</div>
+					</fieldset>
+				</form>
+				";
+			$view->get_html();
+			die();
 			/**
 			 * Create new account 
-			 */
+			 *
 			//if emails provided
 			if(count($emails) && is_array($emails)){
 				$this->create_account($emails[0], $username, $dto->slug, $uid);
@@ -572,7 +640,7 @@ class AutoFlow_API{
 				die();
 			}
 			//end Create new account
-				
+			*/	
 		}		
 	}
 	
