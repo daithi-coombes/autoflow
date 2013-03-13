@@ -398,25 +398,25 @@ class AutoFlow_API{
 				
 				//get user details
 				$res = $module->request(
-					"https://api.github.com/user?access_token={$dto->response['access_token']}&scope=user,public_repo",
+					"https://api.github.com/user?access_token={$dto->response['access_token']}&scope=user,user:email",
 					"get"
 				);
 				$body = json_decode($res['body']);
 				$username = $body->login;
-				list($firstname, $surname) = explode(" ", $body->name, 1);
 				$uid = $body->id;
-				$email = $body->email;
 				
 				/**
 				 * get email
-				 *
+				 */
 				$res = $module->request(
 					"https://api.github.com/user/emails?access_token={$dto->response['access_token']}&scope=user,public_repo",
 					"get"
 				);
-				$emails = (array) $res['body'];
-				 * 
-				 */
+				$body = json_decode($res['body']);
+				if(is_array($body))
+					$email = $body[0];
+				else
+					$email = $body;
 				break;
 			//end Github
 
