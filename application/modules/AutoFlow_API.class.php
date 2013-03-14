@@ -72,7 +72,8 @@ class AutoFlow_API{
 		
 		// Generate the password and create the user
 		$user_id = wp_create_user( $username, $password, $user_data['email'] );
-
+		$API_Connection_Manager->log("Creating new user account");
+		$API_Connection_Manager->log($user_id);
 		//if error creating user, print and die()
 		if(is_wp_error($user_id)){
 			$view->body[] = $user_id->get_error_message ();
@@ -354,8 +355,11 @@ class AutoFlow_API{
 			case 'ci-login/index.php':
 				
 				$module->set_params($dto->response);
-				$username = $uid = $module->get_uid();
-				$emails = false;
+				$res = $module->request("https://ciapi.cityindex.com/tradingapi/useraccount/ClientAndTradingAccount");
+				$body = json_decode($res['body']);
+				$username = $body->LogonUserName;
+				$uid = $module->get_uid();
+				$email = $body->PersonalEmailAddress;
 				break;
 			//end cityindex
 			
