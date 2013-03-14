@@ -74,23 +74,15 @@ class AutoFlow_API{
 		$user_id = wp_create_user( $username, $password, $user_data['email'] );
 		$API_Connection_Manager->log("Creating new user account");
 		$API_Connection_Manager->log($user_id);
-		//if error creating user, print and die()
+		
+		//if error creating user, print for again and die()
 		if(is_wp_error($user_id)){
 			//set autoflow error
 			$_REQUEST['error'] = $user_id->get_error_message();
 			$_REQUEST['username'] = $_REQUEST['nickname'];
+			$_REQUEST['extra_params'] = (array) json_decode(urldecode($_REQUEST['extra_params'])); //will get re-encoded in ::new_acc_form()
 			$this->new_acc_form($_REQUEST);
-			/**
-			$view->body[] = $user_id->get_error_message();
-			$view->body[] = "
-				<a href=\"javascript:history.back()\" 
-				   title=\"Back\"
-				   class=\"btn btn-large btn-primary\">
-				Back</a>";
-			$view->get_html();
 			die();
-			 * 
-			 */
 		}
 		
 		// Set the nickname
