@@ -76,14 +76,21 @@ class AutoFlow_API{
 		$API_Connection_Manager->log($user_id);
 		//if error creating user, print and die()
 		if(is_wp_error($user_id)){
-			$view->body[] = $user_id->get_error_message ();
+			//set autoflow error
+			$_REQUEST['error'] = $user_id->get_error_message();
+			$_REQUEST['username'] = $_REQUEST['nickname'];
+			$this->new_acc_form($_REQUEST);
+			/**
+			$view->body[] = $user_id->get_error_message();
 			$view->body[] = "
-				<a href=\"" . wp_login_url() . "\" 
-				   title=\"Login\"
+				<a href=\"javascript:history.back()\" 
+				   title=\"Back\"
 				   class=\"btn btn-large btn-primary\">
-				Login</a>";
+				Back</a>";
 			$view->get_html();
 			die();
+			 * 
+			 */
 		}
 		
 		// Set the nickname
@@ -165,6 +172,116 @@ class AutoFlow_API{
 	}
 	
 	/**
+	 * Prints/returns the new account bootstrap form
+	 * 
+	 * The params are:
+	 * <code>
+	 * array(
+	 *	'slug',
+	 *	'uid',
+	 *	'username',
+	 *	'extra_params',
+	 *	'firstname',
+	 *	'surname',
+	 *	'email',
+	 *	'error'
+	 * );
+	 * </code>
+	 * @uses API_Con_Mngr_View
+	 * @param array $params
+	 * @param type $die
+	 * @return type
+	 */
+	public function new_acc_form( array $params, $die=true ){
+		
+		$nonce = wp_create_nonce("autoflow_get_email");
+		$view = new API_Con_Mngr_View();
+		$view->body[] = @"
+			<p class=\"lead\">
+				Creating new account. Please fill out the form below
+			</p>";
+		if(@$params['error'])
+			$view->body[] = "
+			<p class=\"alert-error\">
+				{$params['error']}
+			</p>
+				";
+		$view->body[] = "
+			<form method=\"post\" class=\"form-horizontal\">
+				<fieldset>
+					<input type=\"hidden\" name=\"wp_nonce\" value=\"{$nonce}\"/>
+					<input type=\"hidden\" name=\"slug\" value=\"{$params['slug']}\"/>
+					<input type=\"hidden\" name=\"uid\" value=\"{$params['uid']}\"/>
+					<input type=\"hidden\" name=\"autoflow_action\" value=\"new_acc_form_callback\"/>
+					<input type=\"hidden\" name=\"api-con-mngr\" value=\"false\"/>";
+
+		//extra params for custom services
+		if(count(@$params['extra_params'])){
+			$encoded_params = urlencode(json_encode($params['extra_params']));
+			$view->body[] = "
+					<input type=\"hidden\" name=\"extra_params\" value=\"{$encoded_params}\"/>\n";
+		}//end extra params for custom services
+
+		$view->body[] = @"			
+					<div class=\"control-group\">
+						<label class=\"control-label\" for=\"firstname\">
+							Firstname</label>
+						<div class=\"controls\">
+							<input type=\"text\" name=\"firstname\" id=\"firstname\" value=\"{$params['firstname']}\" placeholder=\"Please enter your firstname\" required/>
+						</div>
+					</div>
+					<div class=\"control-group\">
+						<label class=\"control-label\" for=\"Surname\">
+							Surname</label>
+						<div class=\"controls\">
+							<input type=\"text\" name=\"surname\" id=\"surname\" value=\"{$params['surname']}\" placeholder=\"Please enter your surname\" required/>
+						</div>
+					</div>
+					<div class=\"control-group\">
+						<label class=\"control-label\" for=\"nickname\">
+							Nickname</label>
+						<div class=\"controls\">
+							<input type=\"text\" name=\"nickname\" id=\"nickname\" value=\"{$params['username']}\" placeholder=\"Please enter your nickanme\" required/>
+						</div>
+					</div>
+					<div class=\"control-group\">
+						<label class=\"control-label\" for=\"email\">
+							Email</label>
+						<div class=\"controls\">
+							<input type=\"email\" 
+								name=\"email\" 
+								id=\"email\" 
+								value=\"{$params['email']}\"
+								placeholder=\"Please enter your email\"
+								required/>
+						</div>
+					</div>
+					<div class=\"control-group\">
+						<label class=\"control-label\" for=\"email2\">
+							Re-Type Email</label>
+						<div class=\"controls\">
+							<input type=\"email\" 
+								name=\"email2\" 
+								id=\"email2\" 
+								value=\"{$params['email']}\"
+								placeholder=\"Please retype your email\"
+								data-validation-matches-match=\"email\"
+								data-validation-matches-message=\"Must match email address entered above\"
+								/>
+						</div>
+					</div>
+					<div class=\"control-group\">
+						<div class=\"controls\">
+							<button type=\"submit\" class=\"btn\">Create Account</button>
+						</div>
+					</div>
+				</fieldset>
+			</form>
+			";
+		return $view->get_html( $die );
+	}
+	
+	/**
 	 * Process form requesting email address and then create new account.
 	 */
 	public function new_acc_form_callback(){
@@ -186,6 +303,10 @@ class AutoFlow_API{
 		die();
 	}
 	
+	/**
+	 * Styles to hide the wp login form on wp-login.php
+	 * Does not work for forms printed with wp_login_form()
+	 */
 	public function get_styles(){
 		?>
 		<style type="text/css">
@@ -517,152 +638,17 @@ class AutoFlow_API{
 			//store tokens as session
 			$_SESSION['Autoflow-tokens'] = $dto->response;
 			
-			$nonce = wp_create_nonce("autoflow_get_email");
-			$view = new API_Con_Mngr_View();
-			$view->body[] = @"
-				<p class=\"lead\">
-					Creating new account. Please fill out the form below
-				</p>
-				
-				<form method=\"post\" class=\"form-horizontal\">
-					<fieldset>
-						<input type=\"hidden\" name=\"wp_nonce\" value=\"{$nonce}\"/>
-						<input type=\"hidden\" name=\"slug\" value=\"{$dto->slug}\"/>
-						<input type=\"hidden\" name=\"uid\" value=\"{$uid}\"/>
-						<input type=\"hidden\" name=\"username\" value=\"{$username}\"/>
-						<input type=\"hidden\" name=\"autoflow_action\" value=\"new_acc_form_callback\"/>
-						<input type=\"hidden\" name=\"api-con-mngr\" value=\"false\"/>";
-						
-			//extra params for custom services
-			if(count($extra_params)){
-				$encoded_params = urlencode(json_encode($extra_params));
-				$view->body[] = "
-						<input type=\"hidden\" name=\"extra_params\" value=\"{$encoded_params}\"/>\n";
-			}//end extra params for custom services
-			
-			$view->body[] = @"			
-						<div class=\"control-group\">
-							<label class=\"control-label\" for=\"firstname\">
-								Firstname</label>
-							<div class=\"controls\">
-								<input type=\"text\" name=\"firstname\" id=\"firstname\" value=\"{$firstname}\" placeholder=\"Please enter your firstname\" required/>
-							</div>
-						</div>
-						<div class=\"control-group\">
-							<label class=\"control-label\" for=\"Surname\">
-								Surname</label>
-							<div class=\"controls\">
-								<input type=\"text\" name=\"surname\" id=\"surname\" value=\"{$surname}\" placeholder=\"Please enter your surname\" required/>
-							</div>
-						</div>
-						<div class=\"control-group\">
-							<label class=\"control-label\" for=\"nickname\">
-								Nickname</label>
-							<div class=\"controls\">
-								<input type=\"text\" name=\"nickname\" id=\"nickname\" value=\"{$username}\" placeholder=\"Please enter your nickanme\" required/>
-							</div>
-						</div>
-						<div class=\"control-group\">
-							<label class=\"control-label\" for=\"email\">
-								Email</label>
-							<div class=\"controls\">
-								<input type=\"email\" 
-									name=\"email\" 
-									id=\"email\" 
-									value=\"{$email}\"
-									placeholder=\"Please enter your email\"
-									required/>
-							</div>
-						</div>
-						<div class=\"control-group\">
-							<label class=\"control-label\" for=\"email2\">
-								Re-Type Email</label>
-							<div class=\"controls\">
-								<input type=\"email\" 
-									name=\"email2\" 
-									id=\"email2\" 
-									value=\"{$email}\"
-									placeholder=\"Please retype your email\"
-									data-validation-matches-match=\"email\"
-									data-validation-matches-message=\"Must match email address entered above\"
-									/>
-							</div>
-						</div>
-						<div class=\"control-group\">
-							<div class=\"controls\">
-								<button type=\"submit\" class=\"btn\">Create Account</button>
-							</div>
-						</div>
-					</fieldset>
-				</form>
-				";
-			$view->get_html();
-			die();
-			/**
-			 * Create new account 
-			 *
-			//if emails provided
-			if(count($emails) && is_array($emails)){
-				$this->create_account($emails[0], $username, $dto->slug, $uid);
-			}
-			//else print email form
-			else{
-				
-				//build up form
-				$nonce = wp_create_nonce("autoflow_get_email");
-				$view = new API_Con_Mngr_View();
-				$view->body[] = "
-					<p class=\"lead\">
-						Creating new account. Please fill out the form below
-					</p>
-					
-					<form method=\"post\" class=\"form-horizontal\">
-						<fieldset>
-							<input type=\"hidden\" name=\"wp_nonce\" value=\"{$nonce}\"/>
-							<input type=\"hidden\" name=\"slug\" value=\"{$dto->slug}\"/>
-							<input type=\"hidden\" name=\"uid\" value=\"{$uid}\"/>
-							<input type=\"hidden\" name=\"username\" value=\"{$username}\"/>
-							<input type=\"hidden\" name=\"autoflow_action\" value=\"email_form_callback\"/>
-							<input type=\"hidden\" name=\"api-con-mngr\" value=\"false\"/>
-							<div class=\"control-group\">
-								<label class=\"control-label\" for=\"email\">
-									Email</label>
-								<div class=\"controls\">
-									<input type=\"email\" 
-										name=\"email\" 
-										id=\"email\" 
-										placeholder=\"Please enter your email\"
-										required/>
-								</div>
-							</div>
-							<div class=\"control-group\">
-								<label class=\"control-label\" for=\"email2\">
-									Re-Type Email</label>
-								<div class=\"controls\">
-									<input type=\"email\" 
-										name=\"email2\" 
-										id=\"email2\" 
-										placeholder=\"Please retype your email\"
-										data-validation-matches-match=\"email\"
-										data-validation-matches-message=\"Must match email address entered above\"
-										/>
-								</div>
-							</div>
-							<div class=\"control-group\">
-								<div class=\"controls\">
-									<button type=\"submit\" class=\"btn\">Sign In</button>
-								</div>
-							</div>
-						</fieldset>
-					</form>";
-					
-				//print html and die()
-				$view->get_html();
-				die();
-			}
-			//end Create new account
-			*/	
-		}		
+			$this->new_acc_form(array(
+				'username' => @$username,
+				'uid' => @$uid,
+				'email' => @$email,
+				'firstname' => @$firstname,
+				'surname' => @$surname,
+				'extra_params' => @$extra_params,
+				'slug' => @$dto->slug
+			));
+
+		}	
 	}
 	
 	/**
