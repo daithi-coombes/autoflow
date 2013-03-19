@@ -39,7 +39,8 @@ add_action('init', function(){
 	$config->action_key = "{$config->namespace}-action";
 	$config->debug = true;
 	$config->init_modules = array(
-		'AutoFlow_API'
+		//'AutoFlow_API',
+		'AutoFlow_Privacy'
 	);
 	$config->plugin_dir = $PLUGIN_DIR;
 	$config->plugin_url = $PLUGIN_URL;
