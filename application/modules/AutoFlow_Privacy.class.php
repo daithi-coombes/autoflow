@@ -19,15 +19,19 @@ class AutoFlow_Privacy {
 	private $blog;
 	/** @var WP_User The logged in user */
 	private $user;
+	/** @var API_Con_Mngr_View The api-con view class to display network permission denied */
+	private $view;
 
 	public function __construct(){
 
 		/**
 		 * bootstrap
 		 */
+		require_once( WP_PLUGIN_DIR . "/api-connection-manager/class-api-con-mngr-view.php" );
 		$this->admin_email = get_option('admin_email');
 		$this->blog = get_blog_details();
 		$this->user = $this->get_user();
+		$this->view = new API_Con_Mngr_View();
 		$action = @$_REQUEST['autoflow_action'];
 		if(method_exists($this, $action))
 			$this->$action();
@@ -76,27 +80,30 @@ class AutoFlow_Privacy {
 		$nonce = wp_create_nonce('autoflow privacy request permission');
 		
 		//print form
-		?>
-		<div>
-			<h2><?php echo $this->blog->blogname; ?> Permission Denied</h2>
-			<h3>You do not have permission for this site.<br/>
-			Please fill out the form below to request permission</h3>
-		</div>
-		<form method="post">
-			<input type="hidden" name="autoflow_action" value="request_permission"/>
-			<input type="hidden" name="_wpnonce" value="<?php echo $nonce; ?>"/>
-			<ul>
-				<li>
-					<label for="message">Request Permission</label>
-					<textarea name="message" id="message"></textarea>
-				</li>
-				<li>
-					<input type="submit" value="Request Permission"/>
-				</li>
-			</ul>
+		$this->view->body[] = "
+		<p class=\"alert\">
+			You do not have permission to view this site. You can request permission
+			by filling out the form below.
+		</p>
+		<form method=\"post\" class=\"form-horizontal\">
+			<input type=\"hidden\" name=\"autoflow_action\" value=\"request_permission\"/>
+			<input type=\"hidden\" name=\"_wpnonce\" value=\"{$nonce}\"/>
+			<fieldset>
+				<legend>Request Permission Form</legend>
+				<div class=\"control-group\">
+					<label for=\"message\" class=\"control-label\">message</label>
+					<div class=\"controls\">
+						<textarea name=\"message\" id=\"message\" placeholder=\"Enter your message here...\" required></textarea>
+						<p class=\"help-block\">The site admin will respond to your email address {$this->user->data->user_email}</p>
+					</div>
+				</div>
+				<div class=\"form-actions\">
+					<button type=\"submit\" class=\"btn btn-primary\">Request Permission</button>
+				</div>
+			</fieldset>
 		</form>
-		<?php
-		die();
+		";
+		$this->view->get_html();	//will die()
 	}
 
 	/**
