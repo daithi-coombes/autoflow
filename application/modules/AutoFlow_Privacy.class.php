@@ -205,18 +205,19 @@ class AutoFlow_Privacy {
 
 		//success
 		if($sent)
-			print "<p>Your request was sent successfully</p>";
+			$this->view->body[] = "<p>Your request was sent successfully</p>";
 		//fail
 		else
-			print "<p>There was an error sending your request</p>";
+			$this->view->body[] = "<p>There was an error sending your request</p>";
 
-		//print list of blogs assigned to user
-		print "<ul>\n";
+		//$this->view->body[] = list of blogs assigned to user
+		$this->view->body[] = "<p>You can continue to one of the following blogs</p>
+			<ul>";
 		foreach($user_blogs as $blog)
-			print "<li><a href=\"".@get_blog_permalink($blog->userblog_id, null)."\">{$blog->blogname}</a></li>\n";
-		print "</ul>";
+			$this->view->body[] = "<li><a href=\"".@get_blog_permalink($blog->userblog_id, null)."\">{$blog->blogname}</a></li>\n";
+		$this->view->body[] = "</ul>";
 
-		//die
-		die();
+		//print view file and die()
+		$this->view->get_html();
 	}
 }
