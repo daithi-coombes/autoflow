@@ -27,6 +27,8 @@ class AutoFlow_Privacy {
 		/**
 		 * bootstrap
 		 */
+		//if on root blog return
+		if(get_current_blog_id()==1) return;
 		require_once( WP_PLUGIN_DIR . "/api-connection-manager/class-api-con-mngr-view.php" );
 		$this->admin_email = get_option('admin_email');
 		$this->blog = get_blog_details();
@@ -49,9 +51,10 @@ class AutoFlow_Privacy {
 				;
 			}
 
-		//logged out users
+		//logged out users, permission denied by default
 		else
-			ar_print("No user logged in");
+			$this->get_form();
+			
 	}
 	
 	/**
@@ -83,42 +86,60 @@ class AutoFlow_Privacy {
 		//error message
 		$this->view->body[] = "
 		<p class=\"alert\">
-			You do not have permission to view this site. You can request permission
-			by filling out the form below.
-		</p>";
+			You do not have permission to view this site.";
+		if($this->user->ID > 0)
+		$this->view->body[] = " You can request permission
+			by filling out the form below.";
+		$this->view->body[] = "
+			</p>"; //end error message
 
 		//list sites with permission
-		$this->view->body[] = "
-			<p>
-				Current blogs you have permission to view:
-			</p>
-			<ul>\n";
-		foreach($blogs as $blog)
-			$this->view->body[] = "<li>
-				<a href=\"" . @get_blog_permalink($blog->userblog_id, null) . "\">{$blog->blogname}</a>
-			</li>";
-		$this->view->body[] = "</ul>\n";
-
+		if(count($blogs)){
+			$this->view->body[] = "
+				<p>
+					Current blogs you have permission to view:
+				</p>
+				<ul>\n";
+			foreach($blogs as $blog)
+				$this->view->body[] = "<li>
+					<a href=\"" . @get_blog_permalink($blog->userblog_id, null) . "\">{$blog->blogname}</a>
+				</li>";
+			$this->view->body[] = "</ul>\n";
+		} //end list sites with permission
+		
 		//request permission form
-		$this->view->body[] = "
-		<form method=\"post\" class=\"form-horizontal\">
-			<input type=\"hidden\" name=\"autoflow_action\" value=\"request_permission\"/>
-			<input type=\"hidden\" name=\"_wpnonce\" value=\"{$nonce}\"/>
-			<fieldset>
-				<legend>Request Permission Form</legend>
-				<div class=\"control-group\">
-					<label for=\"message\" class=\"control-label\">message</label>
-					<div class=\"controls\">
-						<textarea name=\"message\" id=\"message\" placeholder=\"Enter your message here...\" required></textarea>
-						<p class=\"help-block\">The site admin will respond to your email address {$this->user->data->user_email}</p>
+		if($this->user->ID > 0){
+			$this->view->body[] = "
+			<form method=\"post\" class=\"form-horizontal\">
+				<input type=\"hidden\" name=\"autoflow_action\" value=\"request_permission\"/>
+				<input type=\"hidden\" name=\"_wpnonce\" value=\"{$nonce}\"/>
+				<fieldset>
+					<legend>Request Permission Form</legend>
+					<div class=\"control-group\">
+						<label for=\"message\" class=\"control-label\">message</label>
+						<div class=\"controls\">
+							<textarea name=\"message\" id=\"message\" placeholder=\"Enter your message here...\" required></textarea>
+							<p class=\"help-block\">The site admin will respond to your email address {$this->user->data->user_email}</p>
+						</div>
 					</div>
-				</div>
-				<div class=\"form-actions\">
-					<button type=\"submit\" class=\"btn btn-primary\">Request Permission</button>
-				</div>
-			</fieldset>
-		</form>
+					<div class=\"form-actions\">
+						<button type=\"submit\" class=\"btn btn-primary\">Request Permission</button>
+					</div>
+				</fieldset>
+			</form>
 		";
+		}	
+
+		//logged out users
+		else{
+			switch_to_blog(1);
+			$this->view->body[] = "
+			<p>
+				<a href=\"" . wp_login_url() . "\" class=\"btn btn-primary\">Login or Create Account</a>
+			</p>";
+			restore_current_blog();
+		}
+
 		$this->view->get_html();	//will die()
 	}
 
