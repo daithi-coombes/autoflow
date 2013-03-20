@@ -189,7 +189,8 @@ class AutoFlow_Privacy {
 		
 		//vars
 		$headers = array(
-			"From: {$this->user->data->user_nicename} <{$this->user->data->user_email}>"
+			"From: {$this->user->data->user_nicename} <{$this->user->data->user_email}>",
+			"reply-to: {$this->user->data->user_nicename} <{$this->user->data->user_email}>"
 			);
 		$message = $_REQUEST['message'];
 		$subject = "Permission request for {$this->blog->blogname}";
