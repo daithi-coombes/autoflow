@@ -102,7 +102,7 @@ class AutoFlow_Privacy {
 				<ul>\n";
 			foreach($blogs as $blog)
 				$this->view->body[] = "<li>
-					<a href=\"" . @get_blog_permalink($blog->userblog_id, null) . "\">{$blog->blogname}</a>
+					<a href=\"" . get_site_url($blog->userblog_id) . "\">{$blog->blogname}</a>
 				</li>";
 			$this->view->body[] = "</ul>\n";
 		} //end list sites with permission
@@ -214,7 +214,7 @@ class AutoFlow_Privacy {
 		$this->view->body[] = "<p>You can continue to one of the following blogs</p>
 			<ul>";
 		foreach($user_blogs as $blog)
-			$this->view->body[] = "<li><a href=\"".@get_blog_permalink($blog->userblog_id, null)."\">{$blog->blogname}</a></li>\n";
+			$this->view->body[] = "<li><a href=\"".get_site_url($blog->userblog_id)."\">{$blog->blogname}</a></li>\n";
 		$this->view->body[] = "</ul>";
 
 		//print view file and die()

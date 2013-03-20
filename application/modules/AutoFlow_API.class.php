@@ -80,7 +80,8 @@ class AutoFlow_API{
 			//set autoflow error
 			$_REQUEST['error'] = $user_id->get_error_message();
 			$_REQUEST['username'] = $_REQUEST['nickname'];
-			$_REQUEST['extra_params'] = (array) json_decode(urldecode($_REQUEST['extra_params'])); //will get re-encoded in ::new_acc_form()
+			if(@$_REQUEST['extra_params'])
+				$_REQUEST['extra_params'] = (array) json_decode(urldecode($_REQUEST['extra_params'])); //will get re-encoded in ::new_acc_form()
 			$this->new_acc_form($_REQUEST);
 			die();
 		}
