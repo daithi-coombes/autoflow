@@ -191,8 +191,8 @@ class AutoFlow_Privacy {
 		$headers = array(
 			"From: {$this->user->data->display_name} <{$this->user->data->user_email}>",
 			"reply-to: {$this->user->data->display_name} <{$this->user->data->user_email}>"
-			);
-		ar_print($headers);
+			
+		
 		$message = $_REQUEST['message'];
 		$subject = "Permission request for {$this->blog->blogname}";
 		$user_blogs = get_blogs_of_user( $this->user->ID );
