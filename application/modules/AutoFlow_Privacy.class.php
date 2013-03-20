@@ -189,20 +189,24 @@ class AutoFlow_Privacy {
 		
 		//vars
 		$headers = array(
-			"From: {$this->user->data->user_nicename} <{$this->user->data->user_email}>",
-			"reply-to: {$this->user->data->user_nicename} <{$this->user->data->user_email}>"
+			"From: {$this->user->data->display_name} <{$this->user->data->user_email}>",
+			"reply-to: {$this->user->data->display_name} <{$this->user->data->user_email}>"
 			);
+		ar_print($headers);
 		$message = $_REQUEST['message'];
 		$subject = "Permission request for {$this->blog->blogname}";
 		$user_blogs = get_blogs_of_user( $this->user->ID );
 
-		//send email
+		/**
+		 * send email
+		 */
 		$sent = wp_mail(
 			$this->admin_email,
 			$subject,
 			$message,
 			$headers
 			);
+		//end send email
 
 		//success
 		if($sent)
