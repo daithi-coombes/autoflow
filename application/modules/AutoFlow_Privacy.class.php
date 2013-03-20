@@ -13,8 +13,8 @@
  */
 class AutoFlow_Privacy {
 	
-	/** @var WP_User The admin user for this blog */
-	private $admin;
+	/** @var string The email user for this blog */
+	private $admin_email;
 	/** @var stdClass The current blog information */
 	private $blog;
 	/** @var WP_User The logged in user */
@@ -25,7 +25,7 @@ class AutoFlow_Privacy {
 		/**
 		 * bootstrap
 		 */
-		$this->admin = $this->get_blog_admin();
+		$this->admin_email = get_option('admin_email');
 		$this->blog = get_blog_details();
 		$this->user = $this->get_user();
 		$action = @$_REQUEST['autoflow_action'];
@@ -55,6 +55,7 @@ class AutoFlow_Privacy {
 	 * 
 	 * @link http://www.thinkinginwp.com/2010/02/get-the-list-of-all-admins-for-a-blog-on-wpmu/
 	 * @global wpdb
+	 * @deprecated Only need the email in construct from <code>get_option('admin_email');</code>
 	 * @return WP_User
 	 */
 	private function get_blog_admin(){
@@ -152,7 +153,7 @@ class AutoFlow_Privacy {
 
 		//send email
 		$sent = wp_mail(
-			$this->admin->data->user_email,
+			$this->admin_email,
 			$subject,
 			$message,
 			$headers
@@ -168,7 +169,7 @@ class AutoFlow_Privacy {
 		//print list of blogs assigned to user
 		print "<ul>\n";
 		foreach($user_blogs as $blog)
-			print "<li><a href=\"".get_blog_permalink($blog->userblog_id)."\">{$blog->blogname}</a></li>\n";
+			print "<li><a href=\"".@get_blog_permalink($blog->userblog_id, null)."\">{$blog->blogname}</a></li>\n";
 		print "</ul>";
 
 		//die

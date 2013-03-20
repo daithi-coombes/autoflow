@@ -71,7 +71,6 @@ if(!class_exists("WPPluginFrameWorkConfig")):
 
 			//load modules
 			$this->load_modules();
-
 		}
 
 		/**
