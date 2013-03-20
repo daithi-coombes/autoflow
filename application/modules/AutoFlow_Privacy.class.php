@@ -78,13 +78,29 @@ class AutoFlow_Privacy {
 
 		//vars
 		$nonce = wp_create_nonce('autoflow privacy request permission');
-		
-		//print form
+		$blogs = get_blogs_of_user( $this->user->ID );
+
+		//error message
 		$this->view->body[] = "
 		<p class=\"alert\">
 			You do not have permission to view this site. You can request permission
 			by filling out the form below.
-		</p>
+		</p>";
+
+		//list sites with permission
+		$this->view->body[] = "
+			<p>
+				Current blogs you have permission to view:
+			</p>
+			<ul>\n";
+		foreach($blogs as $blog)
+			$this->view->body[] = "<li>
+				<a href=\"" . @get_blog_permalink($blog->userblog_id, null) . "\">{$blog->blogname}</a>
+			</li>";
+		$this->view->body[] = "</ul>\n";
+
+		//request permission form
+		$this->view->body[] = "
 		<form method=\"post\" class=\"form-horizontal\">
 			<input type=\"hidden\" name=\"autoflow_action\" value=\"request_permission\"/>
 			<input type=\"hidden\" name=\"_wpnonce\" value=\"{$nonce}\"/>
