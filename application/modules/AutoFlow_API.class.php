@@ -3,7 +3,7 @@
 //include api-connection-manager class
 require_once( WP_PLUGIN_DIR . "/api-connection-manager/class-api-connection-manager.php");
 
-class AutoFlow_API extends WPPluginFrameWorkController{
+class AutoFlow_API{
 
 	/** @var string The role assigned to new users */
 	public $new_user_role = "subscriber";
@@ -44,7 +44,7 @@ class AutoFlow_API extends WPPluginFrameWorkController{
 		//add_filter( 'login_message', array(&$this, 'print_login_errors' ) );
 		add_shortcode( 'AutoFlow', array( &$this, 'print_login_buttons' ) );
 		
-		parent::__construct( get_class($this));
+		//parent::__construct( get_class($this));
 	}
 	
 	/**
