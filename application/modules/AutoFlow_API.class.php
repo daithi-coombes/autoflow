@@ -72,8 +72,8 @@ class AutoFlow_API{
 		
 		// Generate the password and create the user
 		$user_id = wp_create_user( $username, $password, $user_data['email'] );
-		$API_Connection_Manager->log("Creating new user account");
-		$API_Connection_Manager->log($user_id);
+		api_con_log("Creating new user account");
+		api_con_log($user_id);
 		
 		//if error creating user, print for again and die()
 		if(is_wp_error($user_id)){
