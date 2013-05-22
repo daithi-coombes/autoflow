@@ -10,7 +10,7 @@
         syntaxCheck="false"
         >
         <testsuites>
-                <testsuite name="Autoflow">
+                <testsuite name="autoflow">
                         <directory>./tests</directory>
                 </testsuite>
         </testsuites>
