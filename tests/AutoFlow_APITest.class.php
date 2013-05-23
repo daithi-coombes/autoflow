@@ -1,6 +1,6 @@
 <?php
 
-class AutoFlow_APITest extends WP_UnitTestCase{
+class AutoFlow_APITest extends PHPUnit_Framework_TestCase{
 
 	function test_foo(){
 		$foo = true;
