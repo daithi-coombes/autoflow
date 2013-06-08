@@ -80,6 +80,8 @@
   <exec executable="phpmd">
    <arg path="${basedir}/application/modules" />
    <arg value="text" />
+   <arg value="cleancode" />
+   <arg value="--reportfile" />
    <arg value="${basedir}/build/phpmd.xml" />
   </exec>
  </target>
