@@ -13,6 +13,7 @@
   <parallel threadCount="2">
    <sequential>
     <antcall target="pdepend"/>
+    <antcall target="phpmd"/>
     <antcall target="phpmd-ci"/>
    </sequential>
    <antcall target="phpcpd"/>
