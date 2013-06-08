@@ -79,7 +79,7 @@
          description="Perform project mess detection using PHPMD and print human readable output. Intended for usage on the command line before committing.">
   <exec executable="phpmd">
    <arg path="${basedir}/application/modules" />
-   <arg value="text" />
+   <arg value="xml" />
    <arg value="cleancode" />
    <arg value="--reportfile" />
    <arg value="${basedir}/build/phpmd.xml" />
