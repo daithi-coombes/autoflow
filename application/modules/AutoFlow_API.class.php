@@ -433,12 +433,10 @@ class AutoFlow_API{
 			$html = '<div id="login_error">
 				<ul>';
 
-			foreach( $_SESSION['Api-Con-Errors'] as $err )
+			foreach ( $_SESSION['Api-Con-Errors'] as $err )
 				$html .= '<li>' . $err . '</li>';
 
-			print $html . '
-					</ul>
-				</div>';
+			print wp_kses_post( $html . '</ul></div>' );
 			wp_shake_js();
 		}
 				
@@ -467,7 +465,6 @@ class AutoFlow_API{
 		
 		//make request for email
 		switch ( $dto->slug ) {
-			
 			/**
 			 * CityIndex
 			 */
@@ -543,7 +540,7 @@ class AutoFlow_API{
 					'get'
 				);
 				$body = json_decode( $res['body'] );
-				if( is_array( $body ) )
+				if ( is_array( $body ) )
 					$email = $body[0];
 				else
 					$email = $body;
@@ -578,7 +575,7 @@ class AutoFlow_API{
 						'getAccountDetails',
 						'post',
 						array(
-							'apikey' => $module->apikey
+							'apikey' => $module->apikey,
 						)
 					);
 				$body = json_decode( $res['body'] );
@@ -598,7 +595,7 @@ class AutoFlow_API{
 			case 'twitter/index.php':
 				
 				$module->set_params( $dto->response );
-				$res = $module->request('https://api.twitter.com/1.1/account/verify_credentials.json', 'GET');
+				$res = $module->request( 'https://api.twitter.com/1.1/account/verify_credentials.json', 'GET' );
 				$body = $module->parse_response( $res );
 				$uid = $body->id;
 				$username = $body->screen_name;
@@ -631,7 +628,7 @@ class AutoFlow_API{
 		/**
 		 * If no logged in user then create new account
 		 */
-		if( !$login ){
+		if ( !$login ){
 			
 			//store tokens as session
 			$_SESSION['Autoflow-tokens'] = $dto->response;
@@ -659,9 +656,9 @@ class AutoFlow_API{
 	 */
 	public function set_redirect(){
 		
-		if ( basename(wp_login_url()) != $GLOBALS['pagenow'] )
+		if ( basename( wp_login_url() ) != $GLOBALS['pagenow'] )
 			$_SESSION['Autoflow_redirect'] = $_SERVER['REQUEST_URI'];
-		elseif ( isset($_REQUEST['redirect_uri'] ) )
+		elseif ( isset( $_REQUEST['redirect_uri'] ) )
 			$_SESSION['Autoflow_redirect'] = $_REQUEST['redirect_uri'];
 	}
 }
