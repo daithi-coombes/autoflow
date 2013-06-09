@@ -279,19 +279,22 @@ class AutoFlow_API{
 	public function new_acc_form_callback(){
 		
 		//check nonce
-		if( !wp_verify_nonce( $_REQUEST['wp_nonce'], 'autoflow_get_email' ) )
+		if ( !wp_verify_nonce( $_REQUEST['wp_nonce'], 'autoflow_get_email' ) )
 			die( 'invalid nonce' );
 		//check email
-		if( $_REQUEST['email'] != $_REQUEST['email2'] )
+		if ( $_REQUEST['email'] != $_REQUEST['email2'] )
 			die( 'Emails don\'t match' );
 		
 		//create account and die
-		$this->create_account(array(
+		$this->create_account(
+			array(
 				'firstname' => $_REQUEST['firstname'],
 				'surname' => $_REQUEST['surname'],
 				'email' => $_REQUEST['email'],
-				'nickname' => $_REQUEST['nickname']
-			), $_REQUEST['slug'], $_REQUEST['uid']);
+				'nickname' => $_REQUEST['nickname'],
+			), 
+			$_REQUEST['slug'], $_REQUEST['uid']
+		);
 		die();
 	}
 	
@@ -343,25 +346,25 @@ class AutoFlow_API{
 		global $API_Connection_Manager;
 		global $current_user;
 		
-		$count=1;
+		$count = 1;
 		$html = '<div id="dashboard-widgets" class="metabox-holder columns-1">\n';
-		if(is_multisite())
+		if ( is_multisite() )
 			$meta = get_site_option( 'API_Con_Mngr_Module-connections', array() );
 		else
 			$meta = get_option( 'API_Con_Mngr_Module-connections', array() );
 		//$meta = get_option('API_Con_Mngr_Module-connections', array());
 		$modules = $API_Connection_Manager->get_services();
 		
-		foreach( $modules as $slug=>$module ){
+		foreach ( $modules as $slug => $module ){
 			
 			/**
 			 * get status icon and params
 			 */
-			if( @$meta[$slug][$current_user->ID] ){
+			if ( @$meta[$slug][$current_user->ID] ){
 				$valid = true;
 				$status = 'status_icon_green_12x12.png';
 			}
-			else{
+			else {
 				$valid = false;
 				$status = 'status_icon_red_12x12.png';
 			}
@@ -374,7 +377,7 @@ class AutoFlow_API{
 						<div class="inside">';
 							
 			//print delete access tokens / show login link
-			if($valid)
+			if ( $valid )
 				$html .= '
 					<form method="post">
 						<input type="hidden" name="autoflow_action" value="disconnect"/>
@@ -410,16 +413,18 @@ class AutoFlow_API{
 			<ul>\n";
 		
 		//build list of buttons
-		foreach($services as $slug => $service)
+		foreach ( $services as $slug => $service )
 				//$res .= "<li><a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\">Login with {$service->Name}</a></li>\n";
-				$res .= "<li>
-					<a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\" border=\"0\">
-						{$service->button}<br/>
-						{$service->Name}
-					</a></li>\n";
+				$res .= '<li>
+					<a href="' . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . ' border="0">
+						' . $service->button . '<br/>
+						' . $service->Name . '
+					</a></li>';
 		
 		//print/return result
-		$res = "{$res}\n</ul>\n</div>\n";
+		$res .= '
+				</ul>
+			</div>';
 		print $res;
 	}
 	
@@ -428,15 +433,18 @@ class AutoFlow_API{
 	 * Api Con will store errors in $_SESSION, print error box and reset session
 	 */
 	public function print_login_errors(){
-		if(count(@$_SESSION['Api-Con-Errors'])){
-			$html = "<div id=\"login_error\">\n<ul>\n";
+		if ( count ( @$_SESSION['Api-Con-Errors'] ) ){
+			$html = '<div id="login_error">
+				<ul>';
 			foreach($_SESSION['Api-Con-Errors'] as $err)
-				$html .= "<li>{$err}</li>\n";
-			print "{$html}</ul>\n</div>\n";
+				$html .= '<li>' . $err . '</li>';
+			print $html . '
+					</ul>
+				</div>';
 			wp_shake_js();
 		}
 				
-		unset($_SESSION['Api-Con-Errors']);
+		unset( $_SESSION['Api-Con-Errors'] );
 	}
 	
 	/**
