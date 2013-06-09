@@ -421,9 +421,7 @@ class AutoFlow_API{
 					</a></li>';
 		
 		//print/return result
-		print $res . '
-				</ul>
-			</div>';
+		print __( $res . '</ul></div>' );
 	}
 	
 	/**
