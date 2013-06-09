@@ -421,7 +421,7 @@ class AutoFlow_API{
 					</a></li>';
 		
 		//print/return result
-		print __( $res . '</ul></div>' );
+		print wp_kses_post( $res . '</ul></div>' );
 	}
 	
 	/**
