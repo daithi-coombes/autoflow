@@ -65,7 +65,7 @@ class AutoFlow_API{
 		$view = new API_Con_Mngr_View();
 		$username = wp_generate_password( 6, false );
 		$password = wp_generate_password( 12, false );
-		while( username_exists( $username ) )	//make sure username is unique 
+		while ( username_exists( $username ) )	//make sure username is unique 
 			$username = wp_generate_password( 6 );
 		
 		// Generate the password and create the user
@@ -74,7 +74,7 @@ class AutoFlow_API{
 		api_con_log( $user_id );
 		
 		//if error creating user, print for again and die()
-		if( is_wp_error( $user_id ) ) {
+		if ( is_wp_error( $user_id ) ){
 			//set autoflow error
 			$_REQUEST['error'] = $user_id->get_error_message( );
 			$_REQUEST['username'] = $_REQUEST['nickname'];
