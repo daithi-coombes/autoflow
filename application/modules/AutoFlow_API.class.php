@@ -6,11 +6,11 @@
 class AutoFlow_API{
 
 	/** @var string The role assigned to new users */
-	public $new_user_role = "subscriber";
+	public $new_user_role = 'subscriber';
 	/** @var API_Connection_Manager The api connection manager */
 	private $api;
 	/** @var string The prefix to use for meta and option keys */
-	private $option_name = "AutoFlow";
+	private $option_name = 'AutoFlow';
 
 	/**
 	 * Construct.
@@ -21,24 +21,23 @@ class AutoFlow_API{
 		
 		global $API_Connection_Manager;
 		$this->api = $API_Connection_Manager;
-		$action = @$_REQUEST['autoflow_action'];
+		$action = @ $_REQUEST[ 'autoflow_action' ];
 		
-		if($action)
-			if(method_exists($this, $action))
+		if( $action )
+			if( method_exists( $this, $action ) )
 				$this->$action();
 		
 		$this->shortcodes = array(
-			'list services' => array(&$this, 'list_services')
+			'list services' => array( &$this, 'list_services' )
 		);
 		
 		//actions
-		add_action('wp_ajax_nopriv_autoflow_api', array(&$this, 'email_form_callback'));
-		//add_action('admin_menu', array(&$this, 'get_menu'));
+		add_action( 'wp_ajax_nopriv_autoflow_api', array( &$this, 'email_form_callback' ) );
 		
 		/**
 		 * login form hooks
 		 */
-		add_action('login_enqueue_scripts', array(&$this, 'get_styles'));
+		add_action( 'login_enqueue_scripts', array(&$this, 'get_styles' ) );
 		add_action( 'login_footer', array( &$this, 'print_login_buttons' ) );
 		//add_action( 'login_form', array( &$this, 'print_login_buttons' ) );
 		//add_filter( 'login_message', array(&$this, 'get_login_buttons' ) );
@@ -46,9 +45,8 @@ class AutoFlow_API{
 		add_shortcode( 'AutoFlow', array( &$this, 'print_login_buttons' ) );
 		
 		//set redirect
-		add_action('init', array( &$this, 'set_redirect'));
+		add_action( 'init', array( &$this, 'set_redirect' ) );
 		
-		//parent::__construct( get_class($this));
 	}
 	
 	/**
@@ -60,59 +58,59 @@ class AutoFlow_API{
 	 * @uses API_Con_Mngr_View To print the results
 	 * @link http://tommcfarlin.com/create-a-user-in-wordpress/
 	 */
-	public function create_account($user_data, $slug, $uid){
+	public function create_account ( $user_data, $slug, $uid ){
 		
 		//vars
 		global $API_Connection_Manager;
 		$view = new API_Con_Mngr_View();
-		$username = wp_generate_password(6, false);
+		$username = wp_generate_password( 6, false );
 		$password = wp_generate_password( 12, false );
-		while(username_exists($username))	//make sure username is unique 
-			$username = wp_generate_password(6);
+		while(username_exists( $username ) )	//make sure username is unique 
+			$username = wp_generate_password( 6 );
 		
 		// Generate the password and create the user
 		$user_id = wp_create_user( $username, $password, $user_data['email'] );
-		api_con_log("Creating new user account");
-		api_con_log($user_id);
+		api_con_log( 'Creating new user account' );
+		api_con_log( $user_id );
 		
 		//if error creating user, print for again and die()
-		if(is_wp_error($user_id)){
+		if( is_wp_error( $user_id ) ){
 			//set autoflow error
 			$_REQUEST['error'] = $user_id->get_error_message();
 			$_REQUEST['username'] = $_REQUEST['nickname'];
-			if(@$_REQUEST['extra_params'])
-				$_REQUEST['extra_params'] = (array) json_decode(urldecode($_REQUEST['extra_params'])); //will get re-encoded in ::new_acc_form()
-			$this->new_acc_form($_REQUEST);
+			if( @$_REQUEST['extra_params'] )
+				$_REQUEST['extra_params'] = (array) json_decode( urldecode( $_REQUEST['extra_params'] ) ); //will get re-encoded in ::new_acc_form()
+			$this->new_acc_form( $_REQUEST );
 			die();
 		}
 		
 		// Set the nickname
-		$user_data = wp_update_user(array(
+		$user_data = wp_update_user( array(
 			'ID' => $user_id,
 			'nickname' => $user_data['nickname'],
 			'display_name' => $user_data['nickname'],
 			'first_name' => $user_data['firstname'],
 			'last_name' => $user_data['surname']
-		));
+		) );
 
 		//link up user with module uid and set tokens
-		$service = $API_Connection_Manager->get_service($slug);
+		$service = $API_Connection_Manager->get_service( $slug );
 		$tokens = $_SESSION['Autoflow-tokens'];
-		unset($_SESSION['Autoflow-tokens']);
-		$login = $service->login_connect($user_id,$uid);
-		$service->user = get_userdata($user_id);
-		$service->set_params($tokens);
+		unset( $_SESSION['Autoflow-tokens'] );
+		$login = $service->login_connect( $user_id, $uid );
+		$service->user = get_userdata( $user_id );
+		$service->set_params( $tokens );
 		
 		//look for custom params taken during authentication
-		if(@$_REQUEST['extra_params']){
-			$extra_params = (array) json_decode(urldecode($_REQUEST['extra_params']));
-			$service->set_params($extra_params);
+		if( @$_REQUEST['extra_params'] ){
+			$extra_params = (array) json_decode( urldecode( $_REQUEST['extra_params'] ) );
+			$service->set_params( $extra_params );
 		}
 		
 		/**
 		 * user created successfully
 		 */
-		if($user_data && !is_wp_error($user_id) && !is_wp_error($login)){
+		if( $user_data && !is_wp_error( $user_id ) && !is_wp_error( $login ) ){
 
 			// Set the role
 			$user = new WP_User( $user_id );
