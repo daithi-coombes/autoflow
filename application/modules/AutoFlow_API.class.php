@@ -58,7 +58,7 @@ class AutoFlow_API{
 	 * @uses API_Con_Mngr_View To print the results
 	 * @link http://tommcfarlin.com/create-a-user-in-wordpress/
 	 */
-	public function create_account ( $user_data, $slug, $uid ) {
+	public function create_account( $user_data, $slug, $uid ) {
 		
 		//vars
 		global $API_Connection_Manager;
