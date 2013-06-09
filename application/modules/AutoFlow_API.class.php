@@ -113,7 +113,6 @@ class AutoFlow_API{
 		 * user created successfully
 		 */
 		if ( $user_data && !is_wp_error( $user_id ) && !is_wp_error( $login ) ){
-
 			// Set the role
 			$user = new WP_User( $user_id );
 			$user->set_role( $this->new_user_role ); //'contributor' );
@@ -139,8 +138,8 @@ class AutoFlow_API{
 		//default print error
 		$view->body[] = '<h2>Error creating account</h2>';
 		//if error creating user, print and die()
-		if ( is_wp_error($user_id) )
-			$view->body[] = $user_id->get_error_message ();
+		if ( is_wp_error( $user_id ) )
+			$view->body[] = $user_id->get_error_message();
 		if ( is_wp_error( $login ) )
 			$view->body[] = $login->get_error_message();
 		$view->body[] = '
@@ -280,7 +279,7 @@ class AutoFlow_API{
 	public function new_acc_form_callback(){
 		
 		//check nonce
-		if( !wp_verify_nonce( $_REQUEST['wp_nonce'],'autoflow_get_email' ) )
+		if( !wp_verify_nonce( $_REQUEST['wp_nonce'], 'autoflow_get_email' ) )
 			die( 'invalid nonce' );
 		//check email
 		if( $_REQUEST['email'] != $_REQUEST['email2'] )
