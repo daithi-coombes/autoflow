@@ -21,10 +21,10 @@ class AutoFlow_API{
 		
 		global $API_Connection_Manager;
 		$this->api = $API_Connection_Manager;
-		$action = @ $_REQUEST[ 'autoflow_action' ];
+		$action = @$_REQUEST['autoflow_action'];
 		
-		if( $action )
-			if( method_exists( $this, $action ) )
+		if ( $action )
+			if ( method_exists( $this, $action ) )
 				$this->$action();
 		
 		$this->shortcodes = array(
@@ -37,11 +37,11 @@ class AutoFlow_API{
 		/**
 		 * login form hooks
 		 */
-		add_action( 'login_enqueue_scripts', array(&$this, 'get_styles' ) );
+		add_action( 'login_enqueue_scripts', array( &$this, 'get_styles' ) );
 		add_action( 'login_footer', array( &$this, 'print_login_buttons' ) );
 		//add_action( 'login_form', array( &$this, 'print_login_buttons' ) );
 		//add_filter( 'login_message', array(&$this, 'get_login_buttons' ) );
-		add_filter( 'login_message', array(&$this, 'print_login_errors' ) );
+		add_filter( 'login_message', array( &$this, 'print_login_errors' ) );
 		add_shortcode( 'AutoFlow', array( &$this, 'print_login_buttons' ) );
 		
 		//set redirect
@@ -58,14 +58,14 @@ class AutoFlow_API{
 	 * @uses API_Con_Mngr_View To print the results
 	 * @link http://tommcfarlin.com/create-a-user-in-wordpress/
 	 */
-	public function create_account ( $user_data, $slug, $uid ){
+	public function create_account ( $user_data, $slug, $uid ) {
 		
 		//vars
 		global $API_Connection_Manager;
 		$view = new API_Con_Mngr_View();
 		$username = wp_generate_password( 6, false );
 		$password = wp_generate_password( 12, false );
-		while(username_exists( $username ) )	//make sure username is unique 
+		while( username_exists( $username ) )	//make sure username is unique 
 			$username = wp_generate_password( 6 );
 		
 		// Generate the password and create the user
@@ -74,9 +74,9 @@ class AutoFlow_API{
 		api_con_log( $user_id );
 		
 		//if error creating user, print for again and die()
-		if( is_wp_error( $user_id ) ){
+		if( is_wp_error( $user_id ) ) {
 			//set autoflow error
-			$_REQUEST['error'] = $user_id->get_error_message();
+			$_REQUEST['error'] = $user_id->get_error_message( );
 			$_REQUEST['username'] = $_REQUEST['nickname'];
 			if( @$_REQUEST['extra_params'] )
 				$_REQUEST['extra_params'] = (array) json_decode( urldecode( $_REQUEST['extra_params'] ) ); //will get re-encoded in ::new_acc_form()
