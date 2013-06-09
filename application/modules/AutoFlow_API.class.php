@@ -119,33 +119,33 @@ class AutoFlow_API{
 			/**
 			* Set service uid to newly created user for future logins.
 			*/
-			$connections = get_option($this->option_name, array());
+			$connections = get_option( $this->option_name, array() );
 			$connections[$slug][$user_id] = $uid;
-			update_option($this->option_name, $connections);
+			update_option( $this->option_name, $connections );
 			//end set service uid
 			
 			//login user
 			wp_set_current_user( $user_id, $username );
 			wp_set_auth_cookie( $user_id );
 			do_action( 'wp_login', $username );
-			wp_redirect( admin_url() . "admin.php?page=api-connection-manager-user" );
+			wp_redirect( admin_url() . 'admin.php?page=api-connection-manager-user' );
 			die();
 		}
 		//end user created successfully
 		
 		
 		//default print error
-		$view->body[] = "<h2>Error creating account</h2>";
+		$view->body[] = '<h2>Error creating account</h2>';
 		//if error creating user, print and die()
 		if(is_wp_error($user_id))
 			$view->body[] = $user_id->get_error_message ();
 		if(is_wp_error($login))
 			$view->body[] = $login->get_error_message();
-		$view->body[] = "
-			<a href=\"" . wp_login_url() . "\" 
-			   title=\"Login\"
-			   class=\"btn btn-large btn-primary\">
-			Login</a>";
+		$view->body[] = '
+			<a href="' . wp_login_url() . '" 
+			   title="Login"
+			   class="btn btn-large btn-primary">
+			Login</a>';
 		$view->get_html();
 		die();
 	}
@@ -155,11 +155,11 @@ class AutoFlow_API{
 	 */
 	public function disconnect(){
 		$user_id = $this->api->get_current_user()->ID;
-		$meta = get_option("API_Con_Mngr_Module-connections", array());
-		unset($meta[$_REQUEST['slug']][$user_id]);
-		if(empty($meta[$_REQUEST['slug']]))
-			unset($meta[$_REQUEST['slug']]);
-		update_option("API_Con_Mngr_Module-connections", $meta);
+		$meta = get_option( 'API_Con_Mngr_Module-connections', array() );
+		unset( $meta[$_REQUEST['slug']][$user_id] );
+		if(empty( $meta[ $_REQUEST['slug'] ] ) )
+			unset( $meta[ $_REQUEST['slug'] ] );
+		update_option( 'API_Con_Mngr_Module-connections', $meta );
 	}
 	
 	/**
@@ -185,90 +185,90 @@ class AutoFlow_API{
 	 */
 	public function new_acc_form( array $params, $die=true ){
 		
-		$nonce = wp_create_nonce("autoflow_get_email");
+		$nonce = wp_create_nonce( 'autoflow_get_email' );
 		$view = new API_Con_Mngr_View();
-		$view->body[] = @"
-			<p class=\"lead\">
+		$view->body[] = @'
+			<p class="lead">
 				Creating new account. Please fill out the form below
-			</p>";
-		if(@$params['error'])
-			$view->body[] = "
-			<p class=\"alert-error\">
-				{$params['error']}
+			</p>';
+		if( @$params['error'] )
+			$view->body[] = '
+			<p class="alert-error">
+				' . $params['error'] . '
 			</p>
-				";
-		$view->body[] = "
-			<form method=\"post\" class=\"form-horizontal\">
+				';
+		$view->body[] = '
+			<form method="post" class="form-horizontal">
 				<fieldset>
-					<input type=\"hidden\" name=\"wp_nonce\" value=\"{$nonce}\"/>
-					<input type=\"hidden\" name=\"slug\" value=\"{$params['slug']}\"/>
-					<input type=\"hidden\" name=\"uid\" value=\"{$params['uid']}\"/>
-					<input type=\"hidden\" name=\"autoflow_action\" value=\"new_acc_form_callback\"/>
-					<input type=\"hidden\" name=\"api-con-mngr\" value=\"false\"/>";
+					<input type="hidden" name="wp_nonce" value="' . $nonce . '"/>
+					<input type="hidden" name="slug" value="' . $params['slug'] . '"/>
+					<input type="hidden" name="uid" value="' . $params['uid'] . '"/>
+					<input type="hidden" name="autoflow_action" value="new_acc_form_callback"/>
+					<input type="hidden" name="api-con-mngr" value="false"/>';
 
 		//extra params for custom services
-		if(count(@$params['extra_params'])){
-			$encoded_params = urlencode(json_encode($params['extra_params']));
-			$view->body[] = "
-					<input type=\"hidden\" name=\"extra_params\" value=\"{$encoded_params}\"/>\n";
+		if( count( @$params['extra_params'] ) ){
+			$encoded_params = urlencode( json_encode( $params['extra_params'] ) );
+			$view->body[] = '
+					<input type="hidden" name="extra_params" value="' . $encoded_params . '"/>\n';
 		}//end extra params for custom services
 
-		$view->body[] = @"			
-					<div class=\"control-group\">
-						<label class=\"control-label\" for=\"firstname\">
+		$view->body[] = @'	
+					<div class="control-group">
+						<label class="control-label" for="firstname">
 							Firstname</label>
-						<div class=\"controls\">
-							<input type=\"text\" name=\"firstname\" id=\"firstname\" value=\"{$params['firstname']}\" placeholder=\"Please enter your firstname\" required/>
+						<div class="controls">
+							<input type="text" name="firstname" id="firstname" value="' . $params['firstname'] . '" placeholder="Please enter your firstname" required/>
 						</div>
 					</div>
-					<div class=\"control-group\">
-						<label class=\"control-label\" for=\"Surname\">
+					<div class="control-group">
+						<label class="control-label" for="Surname">
 							Surname</label>
-						<div class=\"controls\">
-							<input type=\"text\" name=\"surname\" id=\"surname\" value=\"{$params['surname']}\" placeholder=\"Please enter your surname\" required/>
+						<div class="controls">
+							<input type="text" name="surname" id="surname" value="' . $params['surname'] . '" placeholder="Please enter your surname" required/>
 						</div>
 					</div>
-					<div class=\"control-group\">
-						<label class=\"control-label\" for=\"nickname\">
+					<div class="control-group">
+						<label class="control-label" for="nickname">
 							Nickname</label>
-						<div class=\"controls\">
-							<input type=\"text\" name=\"nickname\" id=\"nickname\" value=\"{$params['username']}\" placeholder=\"Please enter your nickanme\" required/>
+						<div class="controls">
+							<input type="text" name="nickname" id="nickname" value="' . $params['username'] . '" placeholder="Please enter your nickanme" required/>
 						</div>
 					</div>
-					<div class=\"control-group\">
-						<label class=\"control-label\" for=\"email\">
+					<div class="control-group">
+						<label class="control-label" for="email">
 							Email</label>
-						<div class=\"controls\">
-							<input type=\"email\" 
-								name=\"email\" 
-								id=\"email\" 
-								value=\"{$params['email']}\"
-								placeholder=\"Please enter your email\"
+						<div class="controls">
+							<input type="email" 
+								name="email" 
+								id="email" 
+								value="' . $params['email'] . '"
+								placeholder="Please enter your email"
 								required/>
 						</div>
 					</div>
-					<div class=\"control-group\">
-						<label class=\"control-label\" for=\"email2\">
+					<div class="control-group">
+						<label class="control-label" for="email2">
 							Re-Type Email</label>
-						<div class=\"controls\">
-							<input type=\"email\" 
-								name=\"email2\" 
-								id=\"email2\" 
-								value=\"{$params['email']}\"
-								placeholder=\"Please retype your email\"
-								data-validation-matches-match=\"email\"
-								data-validation-matches-message=\"Must match email address entered above\"
+						<div class="controls">
+							<input type="email" 
+								name="email2" 
+								id="email2" 
+								value="' . $params['email'] . '"
+								placeholder="Please retype your email"
+								data-validation-matches-match="email"
+								data-validation-matches-message="Must match email address entered above"
 								/>
 						</div>
 					</div>
-					<div class=\"control-group\">
-						<div class=\"controls\">
-							<button type=\"submit\" class=\"btn\">Create Account</button>
+					<div class="control-group">
+						<div class="controls">
+							<button type="submit" class="btn">Create Account</button>
 						</div>
 					</div>
 				</fieldset>
 			</form>
-			";
+			';
 		return $view->get_html( $die );
 	}
 	
@@ -278,11 +278,11 @@ class AutoFlow_API{
 	public function new_acc_form_callback(){
 		
 		//check nonce
-		if(!wp_verify_nonce($_REQUEST['wp_nonce'],"autoflow_get_email"))
-			die("invalid nonce");
+		if( !wp_verify_nonce( $_REQUEST['wp_nonce'],'autoflow_get_email' ) )
+			die( 'invalid nonce' );
 		//check email
-		if($_REQUEST['email']!=$_REQUEST['email2'])
-			die("Emails don't match");
+		if( $_REQUEST['email'] != $_REQUEST['email2'] )
+			die( 'Emails don\'t match' );
 		
 		//create account and die
 		$this->create_account(array(
@@ -327,7 +327,7 @@ class AutoFlow_API{
 	 * @depcrated
 	 */
 	public function get_menu(){
-		add_menu_page("AutoFlow", "AutoFlow", "read", "autoflow", array(&$this, 'get_page'));
+		add_menu_page( 'AutoFlow', 'AutoFlow', 'read', 'autoflow', array( &$this, 'get_page' ) );
 	}
 	
 	/**
@@ -343,52 +343,52 @@ class AutoFlow_API{
 		global $current_user;
 		
 		$count=1;
-		$html = "<div id=\"dashboard-widgets\" class=\"metabox-holder columns-1\">\n";
+		$html = '<div id="dashboard-widgets" class="metabox-holder columns-1">\n';
 		if(is_multisite())
-			$meta = get_site_option("API_Con_Mngr_Module-connections", array());
+			$meta = get_site_option( 'API_Con_Mngr_Module-connections', array() );
 		else
-			$meta = get_option("API_Con_Mngr_Module-connections", array());
-		//$meta = get_option("API_Con_Mngr_Module-connections", array());
+			$meta = get_option( 'API_Con_Mngr_Module-connections', array() );
+		//$meta = get_option('API_Con_Mngr_Module-connections', array());
 		$modules = $API_Connection_Manager->get_services();
 		
-		foreach($modules as $slug=>$module){
+		foreach( $modules as $slug=>$module ){
 			
 			/**
 			 * get status icon and params
 			 */
-			if(@$meta[$slug][$current_user->ID]){
+			if( @$meta[$slug][$current_user->ID] ){
 				$valid = true;
-				$status = "status_icon_green_12x12.png";
+				$status = 'status_icon_green_12x12.png';
 			}
 			else{
 				$valid = false;
-				$status = "status_icon_red_12x12.png";
+				$status = 'status_icon_red_12x12.png';
 			}
 			//end get status icona  and params
-			$html .= "<div id=\"postbox-container-{$count}\" class=\"postbox-container\">
-					<div class=\"postbox\">
+			$html .= '<div id="postbox-container-' . $count . '" class="postbox-container">
+					<div class="postbox">
 						<h3>
-							<img src=\"".WP_PLUGIN_URL."/api-connection-manager/images/{$status}\" width=\"12\" height=\"12\"/>
-							{$module->Name}</h3>
-						<div class=\"inside\">";
+							<img src="".WP_PLUGIN_URL."/api-connection-manager/images/' . $status . '" width="12" height="12"/>
+							' . $module->Name . '</h3>
+						<div class="inside">';
 							
 			//print delete access tokens / show login link
 			if($valid)
-				$html .= "
-					<form method=\"post\">
-						<input type=\"hidden\" name=\"autoflow_action\" value=\"disconnect\"/>
-						<input type=\"hidden\" name=\"slug\" value=\"{$slug}\"/>
-						<input type=\"submit\" value=\"Disconnect\"/>
-					</form>";
+				$html .= '
+					<form method="post">
+						<input type="hidden" name="autoflow_action" value="disconnect"/>
+						<input type="hidden" name="slug" value="' . $slug . '"/>
+						<input type="submit" value="Disconnect"/>
+					</form>';
 			else
-				$html .= "<p>You are not connected to {$module->Name}</p>
-					<p><a href=\"" . $module->get_login_button(__FILE__, array(&$this, 'parse_dto', false)) . "\" target=\"_new\">
-						Connect your wordpress account with {$module->Name}</a>";
+				$html .= '<p>You are not connected to ' . $module->Name . '</p>
+					<p><a href="' . $module->get_login_button( __FILE__, array( &$this, 'parse_dto', false ) ) . '" target="_new">
+						Connect your wordpress account with ' . $module->Name . '</a>';
 					
 			//close container
-			$html .= "	</div>
+			$html .= '	</div>
 					</div>
-				</div>";
+				</div>';
 			$count++;
 		}
 		
