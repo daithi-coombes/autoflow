@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="autoflow" default="build">
+<project name="api-connection-manager" default="build">
  <!-- <target name="build"
    depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdox,phpunit,phpcb"/> -->
  <target name="build"
@@ -110,14 +110,7 @@
    <arg value="--report-file=${basedir}/build/logs/checkstyle.xml" />
    <arg value="--standard=WordPress" />
    <arg value="-vvv" />
-   <arg path="${basedir}/index.php" />
-   <arg path="${basedir}/class-api-con-logger-filter.php" />
-   <arg path="${basedir}/class-api-con-mngr-error.php" />
-   <arg path="${basedir}/class-api-con-mngr-module.php" />
-   <arg path="${basedir}/class-api-con-mngr-view.php" />
-   <arg path="${basedir}/class-api-connection-manager-setup.php" />
-   <arg path="${basedir}/class-api-connection-manager-user.php" />
-   <arg path="${basedir}/class-api-connection-manager.php" />
+   <arg path="${basedir}/application/modules" />
   </exec>
  </target>
 
@@ -125,7 +118,7 @@
   <exec executable="phpcpd">
    <arg value="--log-pmd" />
    <arg value="${basedir}/build/logs/pmd-cpd.xml" />
-   <arg path="${basedir}/" />
+   <arg path="${basedir}/application/modules" />
   </exec>
  </target>
 
