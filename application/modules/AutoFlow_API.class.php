@@ -356,7 +356,6 @@ class AutoFlow_API{
 		$modules = $API_Connection_Manager->get_services();
 		
 		foreach ( $modules as $slug => $module ){
-			
 			/**
 			 * get status icon and params
 			 */
@@ -422,10 +421,9 @@ class AutoFlow_API{
 					</a></li>';
 		
 		//print/return result
-		$res .= '
+		print $res . '
 				</ul>
 			</div>';
-		print $res;
 	}
 	
 	/**
@@ -433,11 +431,13 @@ class AutoFlow_API{
 	 * Api Con will store errors in $_SESSION, print error box and reset session
 	 */
 	public function print_login_errors(){
-		if ( count ( @$_SESSION['Api-Con-Errors'] ) ){
+		if ( count( @$_SESSION['Api-Con-Errors'] ) ){
 			$html = '<div id="login_error">
 				<ul>';
-			foreach($_SESSION['Api-Con-Errors'] as $err)
+
+			foreach( $_SESSION['Api-Con-Errors'] as $err )
 				$html .= '<li>' . $err . '</li>';
+
 			print $html . '
 					</ul>
 				</div>';
@@ -464,20 +464,20 @@ class AutoFlow_API{
 	public function parse_dto( stdClass $dto ){
 		
 		global $API_Connection_Manager;
-		$module = $API_Connection_Manager->get_service($dto->slug);
+		$module = $API_Connection_Manager->get_service( $dto->slug );
 		$extra_params = array();
 		
 		//make request for email
-		switch ($dto->slug) {
+		switch ( $dto->slug ) {
 			
 			/**
 			 * CityIndex
 			 */
 			case 'ci-login/index.php':
 				
-				$module->set_params($dto->response);
-				$res = $module->request("https://ciapi.cityindex.com/tradingapi/useraccount/ClientAndTradingAccount");
-				$body = json_decode($res['body']);
+				$module->set_params( $dto->response );
+				$res = $module->request( 'https://ciapi.cityindex.com/tradingapi/useraccount/ClientAndTradingAccount' );
+				$body = json_decode( $res['body'] );
 				$username = $body->LogonUserName;
 				$uid = $module->get_uid();
 				$email = $body->PersonalEmailAddress;
@@ -489,13 +489,13 @@ class AutoFlow_API{
 			 */
 			case 'dropbox/index.php':
 				
-				$module->set_params($dto->response);
+				$module->set_params( $dto->response );
 				$res = $module->request(
-						"https://api.dropbox.com/1/account/info",
-						"get"
+						'https://api.dropbox.com/1/account/info',
+						'get'
 				);
 				
-				$body = json_decode($res['body']);
+				$body = json_decode( $res['body'] );
 				$uid = $body->uid;
 				$username = $body->display_name;
 				$emails = false;
@@ -506,15 +506,15 @@ class AutoFlow_API{
 			 * Facebook 
 			 */
 			case 'facebook/index.php':
-				$module->set_params(array(
-					'access_token' => $dto->response['access_token']
-				));
+				$module->set_params(
+					array( 'access_token' => $dto->response['access_token'] )
+				);
 				$res = $module->request(
-					"https://graph.facebook.com/me",
+					'https://graph.facebook.com/me',
 					'get'
 				);
 				
-				$body = json_decode($res['body']);
+				$body = json_decode( $res['body'] );
 				$uid = $body->id;
 				$email = $body->email;
 				$username = $body->username;
@@ -530,10 +530,10 @@ class AutoFlow_API{
 				
 				//get user details
 				$res = $module->request(
-					"https://api.github.com/user?access_token={$dto->response['access_token']}&scope=user,user:email",
-					"get"
+					'https://api.github.com/user?access_token=' . $dto->response['access_token'] . '&scope=user,user:email',
+					'get'
 				);
-				$body = json_decode($res['body']);
+				$body = json_decode( $res['body'] );
 				$username = $body->login;
 				$uid = $body->id;
 				
@@ -541,11 +541,11 @@ class AutoFlow_API{
 				 * get email
 				 */
 				$res = $module->request(
-					"https://api.github.com/user/emails?access_token={$dto->response['access_token']}&scope=user,public_repo",
-					"get"
+					'https://api.github.com/user/emails?access_token=' . $dto->response['access_token'] . '&scope=user,public_repo',
+					'get'
 				);
-				$body = json_decode($res['body']);
-				if(is_array($body))
+				$body = json_decode( $res['body'] );
+				if( is_array( $body ) )
 					$email = $body[0];
 				else
 					$email = $body;
@@ -557,12 +557,12 @@ class AutoFlow_API{
 			 */
 			case 'google/index.php':
 				$res = $module->request(
-						"https://www.googleapis.com/oauth2/v1/userinfo?access_token={$dto->response['access_token']}",
-						"GET"
+						'https://www.googleapis.com/oauth2/v1/userinfo?access_token=' . $dto->response['access_token'],
+						'GET'
 						);
 				
 				
-				$profile = json_decode($res['body']);
+				$profile = json_decode( $res['body'] );
 				$email = $profile->email;
 				$firstname = $profile->given_name;
 				$surname = $profile->family_name;
@@ -577,13 +577,13 @@ class AutoFlow_API{
 			case 'mailchimp/index.php':
 				
 				$res = $module->request(
-						"getAccountDetails",
-						"post",
+						'getAccountDetails',
+						'post',
 						array(
 							'apikey' => $module->apikey
 						)
 					);
-				$body = json_decode($res['body']);
+				$body = json_decode( $res['body'] );
 				$extra_params['api_endpoint'] = $module->api_endpoint;
 				$uid = $body->user_id;
 				$username = $body->username;
@@ -599,12 +599,12 @@ class AutoFlow_API{
 			 */
 			case 'twitter/index.php':
 				
-				$module->set_params($dto->response);
-				$res = $module->request("https://api.twitter.com/1.1/account/verify_credentials.json", "GET");
-				$body = $module->parse_response($res);
+				$module->set_params( $dto->response );
+				$res = $module->request('https://api.twitter.com/1.1/account/verify_credentials.json', 'GET');
+				$body = $module->parse_response( $res );
 				$uid = $body->id;
 				$username = $body->screen_name;
-				list($firstname, $surname) = @explode(" ", $body->name, 2);
+				list( $firstname, $surname ) = @explode( ' ', $body->name, 2 );
 				$emails = false;
 				break;
 			
@@ -619,7 +619,7 @@ class AutoFlow_API{
 		
 
 		//vars
-		if(@$API_Connection_Manager->get_current_user()->id)
+		if ( @$API_Connection_Manager->get_current_user()->id )
 			$user_id = $API_Connection_Manager->get_current_user()->id;
 		else
 			$user_id = false;
@@ -628,25 +628,27 @@ class AutoFlow_API{
 		 * If logged in user then connect the account.
 		 * Request must be from dashboard autoflow settings page.
 		 */
-		$login = $module->login($uid);
+		$login = $module->login( $uid );
 		
 		/**
 		 * If no logged in user then create new account
 		 */
-		if(!$login){
+		if( !$login ){
 			
 			//store tokens as session
 			$_SESSION['Autoflow-tokens'] = $dto->response;
 			
-			$this->new_acc_form(array(
-				'username' => @$username,
-				'uid' => @$uid,
-				'email' => @$email,
-				'firstname' => @$firstname,
-				'surname' => @$surname,
-				'extra_params' => @$extra_params,
-				'slug' => @$dto->slug
-			));
+			$this->new_acc_form(
+				array(
+					'username' => @$username,
+					'uid' => @$uid,
+					'email' => @$email,
+					'firstname' => @$firstname,
+					'surname' => @$surname,
+					'extra_params' => @$extra_params,
+					'slug' => @$dto->slug,
+				)
+			);
 
 		}	
 	}
@@ -659,9 +661,9 @@ class AutoFlow_API{
 	 */
 	public function set_redirect(){
 		
-		if(basename(wp_login_url()) != $GLOBALS['pagenow'])
+		if ( basename(wp_login_url()) != $GLOBALS['pagenow'] )
 			$_SESSION['Autoflow_redirect'] = $_SERVER['REQUEST_URI'];
-		elseif(isset($_REQUEST['redirect_uri']))
+		elseif ( isset($_REQUEST['redirect_uri'] ) )
 			$_SESSION['Autoflow_redirect'] = $_REQUEST['redirect_uri'];
 	}
 }
