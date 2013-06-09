@@ -28,7 +28,7 @@ class AutoFlow_Privacy {
 		 * bootstrap
 		 */
 		//if on root blog return
-		if( get_current_blog_id() == 1 ) return;
+		if ( get_current_blog_id() == 1 ) return;
 		require_once( WP_PLUGIN_DIR . '/api-connection-manager/class-api-con-mngr-view.php' );
 		$this->admin_email = get_option( 'admin_email' );
 		$this->blog = get_blog_details();
@@ -42,7 +42,7 @@ class AutoFlow_Privacy {
 		//logged in users
 		if ( $this->user->ID > 0 ){
 			//if not in blog
-			if(!$this->is_user_in_blog())
+			if ( !$this->is_user_in_blog() )
 				$this->get_form();
 		}
 		//logged out users, permission denied by default
@@ -63,7 +63,7 @@ class AutoFlow_Privacy {
 		global $wpdb;
 		$blog = get_blog_details();
 		$key = 'wp_' . $blog->blog_id . '_user_level';
-		$admins = $wpdb->get_results( "SELECT user_id from $wpdb->usermeta AS um WHERE um.meta_key ='". $key."' AND um.meta_value=10");
+		$admins = $wpdb->get_results( "SELECT user_id from $wpdb->usermeta AS um WHERE um.meta_key ='". $key."' AND um.meta_value=10" );
 		return get_userdata( $admins[0]->user_id );
 	}
 
@@ -97,7 +97,7 @@ class AutoFlow_Privacy {
 
 			foreach ( $blogs as $blog )
 				$this->view->body[] = '<li>
-					<a href="' . get_site_url($blog->userblog_id) . '>{$blog->blogname}</a>
+					<a href="' . get_site_url( $blog->userblog_id ) . '>' . $blog->blogname . '</a>
 				</li>';
 
 			$this->view->body[] = '</ul>\n';
@@ -127,7 +127,7 @@ class AutoFlow_Privacy {
 		}	
 
 		//logged out users
-		else{
+		else {
 			switch_to_blog( 1 );
 			$this->view->body[] = '
 			<p>
@@ -167,7 +167,7 @@ class AutoFlow_Privacy {
 				'blog_id' => $this->blog->blog_id,
 			)
 		) as $user)
-			if ( $user->ID==$this->user->ID )
+			if ( $user->ID == $this->user->ID )
 				return true;
 		
 		//default return false
@@ -188,7 +188,7 @@ class AutoFlow_Privacy {
 		//vars
 		$headers = array(
 			'From: ' . $this->user->data->display_name . ' <' . $this->user->data->user_email . '>',
-			'reply-to: ' . $this->user->data->display_name . ' <' . $this->user->data->user_email . '>'
+			'reply-to: ' . $this->user->data->display_name . ' <' . $this->user->data->user_email . '>',
 		);	
 		
 		$message = $_REQUEST['message'];
@@ -217,7 +217,7 @@ class AutoFlow_Privacy {
 		$this->view->body[] = '<p>You can continue to one of the following blogs</p>
 			<ul>';
 		foreach ( $user_blogs as $blog )
-			$this->view->body[] = '<li><a href="' . get_site_url($blog->userblog_id) . '">' . $blog->blogname . '</a></li>\n';
+			$this->view->body[] = '<li><a href="' . get_site_url( $blog->userblog_id ) . '">' . $blog->blogname . '</a></li>\n';
 		$this->view->body[] = '</ul>';
 
 		//print view file and die()
