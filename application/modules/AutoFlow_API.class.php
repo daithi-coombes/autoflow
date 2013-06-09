@@ -91,7 +91,7 @@ class AutoFlow_API{
 				'nickname' => $user_data['nickname'],
 				'display_name' => $user_data['nickname'],
 				'first_name' => $user_data['firstname'],
-				'last_name' => $user_data['surname']
+				'last_name' => $user_data['surname'],
 			)
 		);
 
@@ -104,7 +104,7 @@ class AutoFlow_API{
 		$service->set_params( $tokens );
 		
 		//look for custom params taken during authentication
-		if( @$_REQUEST['extra_params'] ){
+		if ( @$_REQUEST['extra_params'] ){
 			$extra_params = (array) json_decode( urldecode( $_REQUEST['extra_params'] ) );
 			$service->set_params( $extra_params );
 		}
@@ -112,7 +112,7 @@ class AutoFlow_API{
 		/**
 		 * user created successfully
 		 */
-		if( $user_data && !is_wp_error( $user_id ) && !is_wp_error( $login ) ){
+		if ( $user_data && !is_wp_error( $user_id ) && !is_wp_error( $login ) ){
 
 			// Set the role
 			$user = new WP_User( $user_id );
@@ -139,9 +139,9 @@ class AutoFlow_API{
 		//default print error
 		$view->body[] = '<h2>Error creating account</h2>';
 		//if error creating user, print and die()
-		if(is_wp_error($user_id))
+		if ( is_wp_error($user_id) )
 			$view->body[] = $user_id->get_error_message ();
-		if(is_wp_error($login))
+		if ( is_wp_error( $login ) )
 			$view->body[] = $login->get_error_message();
 		$view->body[] = '
 			<a href="' . wp_login_url() . '" 
@@ -159,7 +159,7 @@ class AutoFlow_API{
 		$user_id = $this->api->get_current_user()->ID;
 		$meta = get_option( 'API_Con_Mngr_Module-connections', array() );
 		unset( $meta[$_REQUEST['slug']][$user_id] );
-		if(empty( $meta[ $_REQUEST['slug'] ] ) )
+		if ( empty( $meta[ $_REQUEST['slug'] ] ) )
 			unset( $meta[ $_REQUEST['slug'] ] );
 		update_option( 'API_Con_Mngr_Module-connections', $meta );
 	}
@@ -185,7 +185,7 @@ class AutoFlow_API{
 	 * @param type $die
 	 * @return type
 	 */
-	public function new_acc_form( array $params, $die=true ){
+	public function new_acc_form( array $params, $die = true ){
 		
 		$nonce = wp_create_nonce( 'autoflow_get_email' );
 		$view = new API_Con_Mngr_View();
@@ -193,7 +193,7 @@ class AutoFlow_API{
 			<p class="lead">
 				Creating new account. Please fill out the form below
 			</p>';
-		if( @$params['error'] )
+		if ( @$params['error'] )
 			$view->body[] = '
 			<p class="alert-error">
 				' . $params['error'] . '
@@ -209,7 +209,7 @@ class AutoFlow_API{
 					<input type="hidden" name="api-con-mngr" value="false"/>';
 
 		//extra params for custom services
-		if( count( @$params['extra_params'] ) ){
+		if ( count( @$params['extra_params'] ) ){
 			$encoded_params = urlencode( json_encode( $params['extra_params'] ) );
 			$view->body[] = '
 					<input type="hidden" name="extra_params" value="' . $encoded_params . '"/>\n';
