@@ -421,7 +421,7 @@ class AutoFlow_API{
 					</a></li>';
 		
 		//print/return result
-		print wp_kses_post( $res . '</ul></div>' );
+		print balanceTags( $res . '</ul></div>' );
 	}
 	
 	/**
