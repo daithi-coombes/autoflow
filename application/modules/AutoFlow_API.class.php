@@ -629,7 +629,6 @@ class AutoFlow_API{
 		 * If no logged in user then create new account
 		 */
 		if ( !$login ){
-			
 			//store tokens as session
 			$_SESSION['Autoflow-tokens'] = $dto->response;
 			
@@ -644,7 +643,6 @@ class AutoFlow_API{
 					'slug' => @$dto->slug,
 				)
 			);
-
 		}	
 	}
 	
