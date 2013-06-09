@@ -78,20 +78,22 @@ class AutoFlow_API{
 			//set autoflow error
 			$_REQUEST['error'] = $user_id->get_error_message( );
 			$_REQUEST['username'] = $_REQUEST['nickname'];
-			if( @$_REQUEST['extra_params'] )
+			if ( @$_REQUEST['extra_params'] )
 				$_REQUEST['extra_params'] = (array) json_decode( urldecode( $_REQUEST['extra_params'] ) ); //will get re-encoded in ::new_acc_form()
 			$this->new_acc_form( $_REQUEST );
 			die();
 		}
 		
 		// Set the nickname
-		$user_data = wp_update_user( array(
-			'ID' => $user_id,
-			'nickname' => $user_data['nickname'],
-			'display_name' => $user_data['nickname'],
-			'first_name' => $user_data['firstname'],
-			'last_name' => $user_data['surname']
-		) );
+		$user_data = wp_update_user(
+			array(
+				'ID' => $user_id,
+				'nickname' => $user_data['nickname'],
+				'display_name' => $user_data['nickname'],
+				'first_name' => $user_data['firstname'],
+				'last_name' => $user_data['surname']
+			)
+		);
 
 		//link up user with module uid and set tokens
 		$service = $API_Connection_Manager->get_service( $slug );
