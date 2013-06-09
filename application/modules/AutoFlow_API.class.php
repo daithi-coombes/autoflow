@@ -211,7 +211,7 @@ class AutoFlow_API{
 		if ( count( @$params['extra_params'] ) ){
 			$encoded_params = urlencode( json_encode( $params['extra_params'] ) );
 			$view->body[] = '
-					<input type="hidden" name="extra_params" value="' . $encoded_params . '"/>\n';
+					<input type="hidden" name="extra_params" value="' . $encoded_params . '"/>';
 		}//end extra params for custom services
 
 		$view->body[] = @'	
@@ -347,7 +347,7 @@ class AutoFlow_API{
 		global $current_user;
 		
 		$count = 1;
-		$html = '<div id="dashboard-widgets" class="metabox-holder columns-1">\n';
+		$html = '<div id="dashboard-widgets" class="metabox-holder columns-1">';
 		if ( is_multisite() )
 			$meta = get_site_option( 'API_Con_Mngr_Module-connections', array() );
 		else
@@ -395,7 +395,7 @@ class AutoFlow_API{
 			$count++;
 		}
 		
-		return $html .= "</ul>\n";
+		return $html .= "</ul>";
 	}
 	
 	/**
@@ -409,13 +409,13 @@ class AutoFlow_API{
 		$services = $this->api->get_services();
 		$res = "<div id=\"autoflow-links\">
 			<h2>Connect with...</h2>
-			<ul>\n";
+			<ul>";
 		
 		//build list of buttons
 		foreach ( $services as $slug => $service )
-				//$res .= "<li><a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\">Login with {$service->Name}</a></li>\n";
+				//$res .= "<li><a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\">Login with {$service->Name}</a></li>";
 				$res .= '<li>
-					<a href="' . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . ' border="0">
+					<a href="' . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . '" border="0">
 						' . $service->button . '<br/>
 						' . $service->Name . '
 					</a></li>';
