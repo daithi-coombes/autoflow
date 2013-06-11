@@ -110,6 +110,8 @@
    <arg value="--report-file=${basedir}/build/logs/checkstyle.xml" />
    <arg value="--standard=WordPress" />
    <arg value="-vvv" />
+   <arg value="-l" />
+   <arg value="-n" />
    <arg path="${basedir}/application/modules/" />
   </exec>
  </target>
