@@ -45,6 +45,7 @@ class AutoFlow_Privacy {
 			if ( !$this->is_user_in_blog() )
 				$this->get_form();
 		}
+		
 		//logged out users, permission denied by default
 		else
 			$this->get_form();
