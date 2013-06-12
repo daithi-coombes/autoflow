@@ -6,7 +6,7 @@ ob_start();
 require_once('config.php');
 
 //change this to your path
-$path = '/var/www/wordpress.loc/foo/wordpress-tests/includes/bootstrap.php';
+$path = '/var/lib/jenkins/jobs/wordpress-tests/includes/bootstrap.php';
 
 if (file_exists($path)) {
     $GLOBALS['wp_tests_options'] = $options;
