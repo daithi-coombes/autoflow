@@ -1,5 +1,5 @@
 *.sublime-project
 *.sublime-workspace
 cache.properties
+tests/bootstrap.php
 build/
-tests/
