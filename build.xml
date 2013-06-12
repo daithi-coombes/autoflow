@@ -136,7 +136,7 @@
     <arg value="${basedir}/build/logs/clover.xml" />
     <arg value="--coverage-html" />
     <arg value="${basedir}/build/logs/" />
-    <arg value="." />
+    <arg value="${basedir}/tests/application/modules/" />
   </exec>
  </target>
 
