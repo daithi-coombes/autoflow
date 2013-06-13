@@ -395,7 +395,7 @@ class AutoFlow_API{
 			$count++;
 		}
 		
-		return $html .= "</ul>";
+		return $html .= '</ul>';
 	}
 	
 	/**
@@ -407,13 +407,12 @@ class AutoFlow_API{
 		
 		//vars
 		$services = $this->api->get_services();
-		$res = "<div id=\"autoflow-links\">
+		$res = '<div id="autoflow-links">
 			<h2>Connect with...</h2>
-			<ul>";
+			<ul>';
 		
 		//build list of buttons
 		foreach ( $services as $slug => $service )
-				//$res .= "<li><a href=\"" . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . "\">Login with {$service->Name}</a></li>";
 				$res .= '<li>
 					<a href="' . $service->get_login_button( __FILE__, array(&$this, 'parse_dto') ) . '" border="0">
 						' . $service->button . '<br/>
