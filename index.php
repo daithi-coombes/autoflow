@@ -11,14 +11,14 @@
   Author URI: http://david-coombes.com
  */
 //autoloader
-$autoloader = create_function('$class', '
+function Autoflow_Autoload($class){
 	$PLUGIN_DIR =  WP_PLUGIN_DIR . "/" . basename(dirname( __FILE__ ));
 	$PLUGIN_URL =  WP_PLUGIN_URL . "/" . basename(dirname( __FILE__ ));
 	$class = ucfirst($class);
 	@include_once( $PLUGIN_DIR . "/application/{$class}.class.php");
 	@include_once( $PLUGIN_DIR . "/application/modules/{$class}.class.php");
-');
-spl_autoload_register($autoloader,true);
+}
+spl_autoload_register("Autoflow_Autoload");
 
 add_action('init', function(){
 	
