@@ -1,7 +1,7 @@
 <?php
 
 //include api-connection-manager class
-//require_once( WP_PLUGIN_DIR . "/api-connection-manager/class-api-connection-manager.php");
+require_once( WP_PLUGIN_DIR . "/api-connection-manager/index.php" );
 
 class AutoFlow_API{
 
