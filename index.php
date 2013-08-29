@@ -37,7 +37,7 @@ add_action('init', function(){
 	//setup plugin config
 	$config->namespace = "wp-plugin-framework";
 	$config->action_key = "{$config->namespace}-action";
-	$config->debug = true;
+	$config->debug = false;
 	$config->init_modules = array(
 		'AutoFlow_API',
 		'AutoFlow_Privacy'

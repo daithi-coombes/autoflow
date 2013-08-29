@@ -141,6 +141,7 @@ if(!class_exists("WPPluginFrameWorkConfig")):
 			
 			//debug on
 			if($this->debug){
+				var_dump($this);
 				require_once( $this->plugin_dir . "/application/includes/debug.func.php");
 				error_reporting(E_ALL ^ E_STRICT);
 				ini_set('display_errors', 'on');

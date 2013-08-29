@@ -18,7 +18,7 @@
  * @link http://joliclic.free.fr/php/javascript-packer/en/
  * @package js-compressor
  */
-error_reporting(E_ALL ^ E_STRICT);
+error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
 ini_set('display_errors','on');
 /**
  * include the JavaScriptPacker class.
