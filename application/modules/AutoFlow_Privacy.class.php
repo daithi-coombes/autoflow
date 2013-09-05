@@ -1,6 +1,8 @@
 <?php
 /**
- * Prevents logged in users from accessing sub-sites they are not registered on.
+ * - Prevents logged in users from accessing sub-sites they are not registered on.
+ * - If user is not connected to any services, when they login they can only
+ * access the `user connections` page.
  * 
  * Will display a form to request permission. This form will be auto emailed to
  * the registerd admin of that site, with the users email as the reply-to
