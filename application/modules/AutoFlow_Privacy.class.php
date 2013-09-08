@@ -29,14 +29,19 @@ class AutoFlow_Privacy {
 		/**
 		 * bootstrap
 		 */
-		//if on root blog return
-		if ( get_current_blog_id() == 1 ) return;
 		require_once( WP_PLUGIN_DIR . '/api-connection-manager/class-api-con-mngr-view.php' );
 		$this->admin_email = get_option( 'admin_email' );
 		$this->blog = get_blog_details();
 		$this->user = $this->get_user();
 		$this->view = new API_Con_Mngr_View();
 		$action = @$_REQUEST['autoflow_action'];
+
+		//if user no connections redirect to user connections dash page
+		$this->check_has_connections();
+		//if on root blog return
+		if ( get_current_blog_id() == 1 ) return;
+
+		//do actions
 		if ( method_exists( $this, $action ) )
 			$this->$action();
 		//end bootstrap
@@ -52,6 +57,32 @@ class AutoFlow_Privacy {
 		else
 			$this->get_form();
 			
+	}
+
+	/**
+	 * Force user to connect to at least one service.
+	 * If user is not connected to any services then they will be redirected to
+	 * the user connections page with an error message to connect.
+	 */
+	private function check_has_connections(){
+		require_once( WP_PLUGIN_DIR . '/api-connection-manager/class-api-connection-manager.php' );
+		require_once( WP_PLUGIN_DIR . '/api-connection-manager/class-api-con-mngr-error.php' );
+		$api = new API_Connection_Manager();
+		$connected = false;
+		$user = wp_get_current_user();
+
+		$connections = get_site_option('API_Con_Mngr_Module-connections');
+		if ( !empty($connections) )
+			foreach($connections as $slug => $connection)
+				foreach($connection as $id => $profile_id)
+					if( $id == $user->ID )
+						$connected = true;
+		
+		if ( !$connected ){ 
+			$error = new API_Con_Mngr_Error('You must connect to at least one service to continue'); //@see API_Connection_Manager::admin_notices()
+			if( $_GET['page']!='api-connection-manager-user' )
+				wp_redirect( admin_url('admin.php?page=api-connection-manager-user') );
+		}
 	}
 	
 	/**
