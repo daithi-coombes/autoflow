@@ -152,9 +152,12 @@ class AutoFlow_API{
 	}
 	
 	/**
-	 * Disconnect a user from a service 
-	 */
+	 * Disconnect a user from a service
+	 * @deprecated  Disconnect button calls 
+	 * API_Connection_Manager_User::disconnect()
+	 *
 	public function disconnect(){
+		var_dump($this);
 		$user_id = $this->api->get_current_user()->ID;
 		$meta = get_option( 'API_Con_Mngr_Module-connections', array() );
 		unset( $meta[$_REQUEST['slug']][$user_id] );
@@ -162,6 +165,7 @@ class AutoFlow_API{
 			unset( $meta[ $_REQUEST['slug'] ] );
 		update_option( 'API_Con_Mngr_Module-connections', $meta );
 	}
+	*/
 	
 	/**
 	 * Prints/returns the new account bootstrap form
