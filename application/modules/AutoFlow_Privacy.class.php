@@ -65,6 +65,7 @@ class AutoFlow_Privacy {
 	 * the user connections page with an error message to connect.
 	 */
 	private function check_has_connections(){
+
 		require_once( WP_PLUGIN_DIR . '/api-connection-manager/class-api-connection-manager.php' );
 		require_once( WP_PLUGIN_DIR . '/api-connection-manager/class-api-con-mngr-error.php' );
 		$api = new API_Connection_Manager();
@@ -79,9 +80,13 @@ class AutoFlow_Privacy {
 						$connected = true;
 		
 		if ( !$connected ){ 
-			$error = new API_Con_Mngr_Error('You must connect to at least one service to continue'); //@see API_Connection_Manager::admin_notices()
-			if( $_GET['page']!='api-connection-manager-user' )
+			if( 
+				$_GET['page']!='api-connection-manager-user' &&
+				$_SERVER['PHP_SELF'] != '/wp-login.php'
+			){
+				$error = new API_Con_Mngr_Error('You must connect to at least one service to continue'); //@see API_Connection_Manager::admin_notices()
 				wp_redirect( admin_url('admin.php?page=api-connection-manager-user') );
+			}
 		}
 	}
 	
