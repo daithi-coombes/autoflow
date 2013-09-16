@@ -81,9 +81,9 @@ class AutoFlow_Privacy {
 		
 		if ( !$connected ){ 
 			if( 
-				$_GET['page'] != 'api-connection-manager-user' ||
-				$_GET['page'] != 'api-connection-manager-service' ||
-				$_GET['page'] != 'api-connection-manager-setup' ||
+				$_GET['page'] != 'api-connection-manager-user' &&
+				$_GET['page'] != 'api-connection-manager-service' &&
+				$_GET['page'] != 'api-connection-manager-setup' &&
 				$_SERVER['PHP_SELF'] != '/wp-login.php'
 			){
 				$error = new API_Con_Mngr_Error('You must connect to at least one service to continue'); //@see API_Connection_Manager::admin_notices()
