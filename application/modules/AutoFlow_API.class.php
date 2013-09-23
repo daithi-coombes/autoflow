@@ -189,6 +189,9 @@ class AutoFlow_API{
 	 * @return type
 	 */
 	public function new_acc_form( array $params, $die = true ){
+
+		//get api-con autoloader
+		require_once( WP_PLUGIN_DIR . "/api-connection-manager/index.php" );
 		
 		$nonce = wp_create_nonce( 'autoflow_get_email' );
 		$view = new API_Con_Mngr_View();
