@@ -65,7 +65,7 @@ class AutoFlow_Privacy {
 	 * the user connections page with an error message to connect.
 	 */
 	private function check_has_connections(){
-		
+
 		require_once( WP_PLUGIN_DIR . '/api-connection-manager/class-api-connection-manager.php' );
 		require_once( WP_PLUGIN_DIR . '/api-connection-manager/class-api-con-mngr-error.php' );
 		$api = new API_Connection_Manager();

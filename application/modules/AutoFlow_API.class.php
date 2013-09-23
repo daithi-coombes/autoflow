@@ -474,11 +474,8 @@ class AutoFlow_API{
 			case 'ci-login/index.php':
 				
 				$module->set_params( $dto->response );
-				$res = $module->request( 'https://ciapi.cityindex.com/tradingapi/useraccount/ClientAndTradingAccount' );
-				$body = json_decode( $res['body'] );
-				$username = $body->LogonUserName;
-				$uid = $module->get_uid();
-				$email = $body->PersonalEmailAddress;
+				$username = $dto->response['username'];
+				$uid = $dto->response['username'];
 				break;
 			//end cityindex
 			

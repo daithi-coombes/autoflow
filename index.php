@@ -19,6 +19,8 @@ function Autoflow_Autoload($class){
 	@include_once( $PLUGIN_DIR . "/application/modules/{$class}.class.php");
 }
 spl_autoload_register("Autoflow_Autoload");
+$PLUGIN_DIR =  WP_PLUGIN_DIR . "/" . basename(dirname( __FILE__ ));
+require_once( $PLUGIN_DIR . '/../api-connection-manager/index.php' );
 
 add_action('init', function(){
 	
