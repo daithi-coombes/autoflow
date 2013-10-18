@@ -81,7 +81,6 @@ class AutoFlow_Privacy {
 						$connected = true;
 		
 		if ( !$connected ){
-			var_dump($_SERVER);
 			if( 
 				$_GET['page'] != 'api-connection-manager-user' &&
 				$_GET['page'] != 'api-connection-manager-service' &&
