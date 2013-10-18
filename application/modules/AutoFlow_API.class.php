@@ -464,7 +464,7 @@ class AutoFlow_API{
 	 * @param stdClass $dto The response dto.
 	 */
 	public function parse_dto( stdClass $dto ){
-		
+		var_dump($dto);
 		global $API_Connection_Manager;
 		$module = $API_Connection_Manager->get_service( $dto->slug );
 		$extra_params = array();
@@ -513,6 +513,8 @@ class AutoFlow_API{
 				);
 				
 				$body = json_decode( $res['body'] );
+				var_dump($body);
+				die();
 				$uid = $body->id;
 				$email = $body->email;
 				$username = $body->username;
