@@ -31,7 +31,8 @@ class AutoFlow_Privacy {
 		 */
 		require_once( WP_PLUGIN_DIR . '/api-connection-manager/class-api-con-mngr-view.php' );
 		$this->admin_email = get_option( 'admin_email' );
-		$this->blog = get_blog_details();
+		if ( is_multisite() )
+			$this->blog = get_blog_details();
 		$this->user = $this->get_user();
 		$this->view = new API_Con_Mngr_View();
 		$action = @$_REQUEST['autoflow_action'];
@@ -80,6 +81,7 @@ class AutoFlow_Privacy {
 						$connected = true;
 		
 		if ( !$connected ){ 
+
 			if( 
 				$_GET['page'] != 'api-connection-manager-user' &&
 				$_GET['page'] != 'api-connection-manager-service' &&
@@ -88,6 +90,7 @@ class AutoFlow_Privacy {
 			){
 				$error = new API_Con_Mngr_Error('You must connect to at least one service to continue'); //@see API_Connection_Manager::admin_notices()
 				wp_redirect( admin_url('admin.php?page=api-connection-manager-user') );
+				die();
 			}
 		}
 	}
@@ -102,6 +105,10 @@ class AutoFlow_Privacy {
 	 */
 	private function get_blog_admin(){
 		global $wpdb;
+
+		if ( !is_multisite() )
+			return get_userdata( 1 );
+
 		$blog = get_blog_details();
 		$key = 'wp_' . $blog->blog_id . '_user_level';
 		$admins = $wpdb->get_results( "SELECT user_id from $wpdb->usermeta AS um WHERE um.meta_key ='". $key."' AND um.meta_value=10" );
@@ -202,6 +209,10 @@ class AutoFlow_Privacy {
 		if ( $this->user->ID == 0 )
 			return false;
 		
+		//single site installs, all users are in blog
+		if ( !is_multisite() )
+			return true;
+
 		//iterate through current blog users, return true if found
 		foreach ( get_users(
 			array(
