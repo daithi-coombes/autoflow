@@ -10,6 +10,7 @@
   Author: Daithi Coombes
   Author URI: http://david-coombes.com
  */
+
 //autoloader
 function Autoflow_Autoload($class){
 	$PLUGIN_DIR =  WP_PLUGIN_DIR . "/" . basename(dirname( __FILE__ ));
