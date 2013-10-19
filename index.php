@@ -9,7 +9,7 @@
   Version: 0.1
   Author: Daithi Coombes
   Author URI: http://david-coombes.com
- */
+*/
 
 //autoloader
 function Autoflow_Autoload($class){
