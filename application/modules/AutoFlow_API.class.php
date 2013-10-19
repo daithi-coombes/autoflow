@@ -513,8 +513,6 @@ class AutoFlow_API{
 				);
 				
 				$body = json_decode( $res['body'] );
-				var_dump($body);
-				die();
 				$uid = $body->id;
 				$email = $body->email;
 				$username = $body->username;
